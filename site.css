@@ -1,0 +1,22 @@
+body {
+    display: flex;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+.container {
+    flex: 1 1 auto;
+    border-radius: 5px;
+    border: 2px dotted blue;
+    padding: 5px;
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.component {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin: 5px;
+}
