@@ -4,7 +4,35 @@ body {
     text-align: center;
 }
 
-.container {
+playerList,
+player,
+team {
+    display: block;
+    flex: 1 1 auto;
+}
+
+player {
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+team {
+    display: flex;
+}
+
+.player-display, .team-container {
+    flex: 1 1 auto;
+}
+
+.player-container {
+    min-height: 50px;
+    border: 1px solid black;
+    padding: 5px;
+}
+
+/* .container {
     flex: 1 1 auto;
     border-radius: 5px;
     border: 2px dotted blue;
@@ -19,4 +47,4 @@ body {
     border-radius: 5px;
     border: 1px solid black;
     margin: 5px;
-}
+} */
