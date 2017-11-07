@@ -7,10 +7,6 @@ export default class PlayerComponent extends Component {
         this._id = player.id;
         this.name = player.name;
         this.score = player.score;
-
-        this.element.addEventListener("dragstart", ev => {
-            ev.dataTransfer.setData("text", this.id);
-        });
     }
 
     get id() { return this._id; };

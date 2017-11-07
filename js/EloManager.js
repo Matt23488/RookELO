@@ -14,37 +14,91 @@ export default class EloManager {
             { id: 6, name: "Joey", score: 1000 },
             { id: 7, name: "John", score: 984 },
         ];
-
-        function handleDrop(playerId, container) {
-            container.appendChild()
-        }
         
-        const playerList = PlayerList.initialize(players);
+        this._playerList = PlayerList.initialize(players);
+        this._team1 = new Team("team1");
+        this._team2 = new Team("team2");
+        this._playerLocations = new Map();
 
-        function handleAddPlayer1(team, playerId) {
-            const matchedPlayer = playerList.find(playerId);
-            team.player1 = matchedPlayer;
-        }
-
-        function handleAddPlayer2(team, playerId) {
-            const matchedPlayer = playerList.find(playerId);
-            team.player2 = matchedPlayer;
-        }
-        
-        function handleRemovePlayer(playerId) {
-            playerList.reclaim(playerId);
-        }
-
-        const team1 = new Team("team1");
-        team1.events.listen("addPlayer1", playerId => handleAddPlayer1(team1, playerId));
-        team1.events.listen("addPlayer2", playerId => handleAddPlayer2(team1, playerId));
-        team1.events.listen("removePlayer1", handleRemovePlayer);
-        team1.events.listen("removePlayer2", handleRemovePlayer);
-
-        const team2 = new Team("team2");
-        team2.events.listen("addPlayer1", playerId => handleAddPlayer1(team2, playerId));
-        team2.events.listen("addPlayer2", playerId => handleAddPlayer2(team2, playerId));
-        team2.events.listen("removePlayer1", handleRemovePlayer);
-        team2.events.listen("removePlayer2", handleRemovePlayer);
+        wireEvents(this);
     }
+
+    get playerList() { return this._playerList; }
+    get team1() { return this._team1; }
+    get team2() { return this._team2; }
+}
+
+function wireEvents(manager) {
+    // Team 1 Player 1
+    manager.team1.player1Container.addEventListener("dragover", ev => {
+        ev.preventDefault();
+    });
+    manager.team1.player1Container.addEventListener("drop", ev => {
+        handleDropEvent(ev, manager, "team1", "player1");
+    });
+    // Team 1 Player 2
+    manager.team1.player2Container.addEventListener("dragover", ev => {
+        ev.preventDefault();
+    });
+    manager.team1.player2Container.addEventListener("drop", ev => {
+        handleDropEvent(ev, manager, "team1", "player2");
+    });
+    // Team 2 Player 1
+    manager.team2.player1Container.addEventListener("dragover", ev => {
+        ev.preventDefault();
+    });
+    manager.team2.player1Container.addEventListener("drop", ev => {
+        handleDropEvent(ev, manager, "team2", "player1");
+    });
+    // Team 2 Player 2
+    manager.team2.player2Container.addEventListener("dragover", ev => {
+        ev.preventDefault();
+    });
+    manager.team2.player2Container.addEventListener("drop", ev => {
+        handleDropEvent(ev, manager, "team2", "player2");
+    });
+
+    // Players
+    manager.playerList.players.forEach(player => {
+        player.element.addEventListener("dragstart", ev => {
+            ev.dataTransfer.setData("text", player.id);
+        });
+    });
+
+    // Player List
+    manager.playerList.element.addEventListener("dragover", ev => {
+        ev.preventDefault();
+    });
+    manager.playerList.element.addEventListener("drop", ev => {
+        ev.preventDefault();
+
+        const playerId = parseInt(ev.dataTransfer.getData("text"));
+        const matchedPlayer = manager.playerList.find(playerId);
+        
+        manager.playerList.reclaim(matchedPlayer);
+
+        const prevLocation = manager._playerLocations.get(matchedPlayer);
+        if (prevLocation !== undefined) {
+            manager[prevLocation.team][prevLocation.player] = undefined;
+            manager._playerLocations.delete(matchedPlayer);
+        }
+    });
+}
+
+function handleDropEvent(ev, manager, team, player) {
+    ev.preventDefault();
+
+    const playerId = parseInt(ev.dataTransfer.getData("text"));
+    const matchedPlayer = manager.playerList.find(playerId);
+
+    if (manager[team][player] !== undefined) {
+        manager.playerList.reclaim(manager[team][player]);
+    }
+    manager[team][player] = matchedPlayer;
+    
+    const prevLocation = manager._playerLocations.get(matchedPlayer);
+    if (prevLocation !== undefined) {
+        manager[prevLocation.team][prevLocation.player] = undefined;
+    }
+    manager._playerLocations.set(matchedPlayer, { team, player });
 }

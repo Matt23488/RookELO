@@ -19,8 +19,7 @@ export default class PlayerListComponent extends Component {
         return this.players.find(player => player.id === playerId);
     }
 
-    reclaim(playerId) {
-        const player = this.find(playerId);
+    reclaim(player) {
         this._element.appendChild(player.element);
     }
 
