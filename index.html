@@ -4,42 +4,70 @@
         <title>Rook ELO</title>
         <link href="site.css" rel="stylesheet" />
     </head>
-    <body>
-        <playerList>
-            <h2>Player List</h2>
-            <template id="playerTemplate">
-                <player draggable="true">
-                    <span class="name"></span>:
-                    <span class="score"></span>
-                </player>
-            </template>
-        </playerList>
-        <div class="team-container">
+    <body class="container">
+
+        <div>
+            <playerList>
+                <h2>Player List</h2>
+                <template id="playerTemplate">
+                    <player draggable="true">
+                        <span class="name"></span>:
+                        <span class="score"></span>
+                    </player>
+                </template>
+            </playerList>
+        </div>
+
+        <div class="flex">
             <h3>Team 1</h3>
             <team id="team1">
-                <div class="player1 player-display">
-                    <h4>Player 1</h4>
-                    <div class="player-container"></div>
+                <div class="container">
+                    <div class="flex player1 player-display">
+                        <h4>Player 1</h4>
+                        <div class="player-container"></div>
+                    </div>
+                    <div class="flex player2 player-display">
+                        <h4>Player 2</h4>
+                        <div class="player-container"></div>
+                    </div>
                 </div>
-                <div class="player2 player-display">
-                    <h4>Player 2</h4>
-                    <div class="player-container"></div>
+                <div class="average-section hidden">
+                    <h4>Average: <span class="average-display"></span></h4>
+                </div>
+                <div class="transform-section hidden">
+                    <h4>Transform: <span class="transform-display"></span></h4>
+                </div>
+                <div class="expected-section hidden">
+                    <h4>Expected: <span class="expected-display"></span></h4>
                 </div>
             </team>
         </div>
-        <div class="team-container">
+
+        <div class="flex">
             <h3>Team 2</h3>
             <team id="team2">
-                <div class="player1 player-display">
-                    <h4>Player 1</h4>
-                    <div class="player-container"></div>
+                <div class="container">
+                    <div class="flex player1 player-display">
+                        <h4>Player 1</h4>
+                        <div class="player-container"></div>
+                    </div>
+                    <div class="flex player2 player-display">
+                        <h4>Player 2</h4>
+                        <div class="player-container"></div>
+                    </div>
                 </div>
-                <div class="player2 player-display">
-                    <h4>Player 2</h4>
-                    <div class="player-container"></div>
+                <div class="average-section hidden">
+                    <h4>Average: <span class="average-display"></span></h4>
+                </div>
+                <div class="transform-section hidden">
+                    <h4>Transform: <span class="transform-display"></span></h4>
+                </div>
+                <div class="expected-section hidden">
+                    <h4>Expected: <span class="expected-display"></span></h4>
                 </div>
             </team>
         </div>
+
         <script type="module" src="js/site.js"></script>
     </body>
 </html>

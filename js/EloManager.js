@@ -1,24 +1,26 @@
 import PlayerList from "./components/PlayerList.js";
 import Team from "./components/Team.js";
+import Calculator from "./Calculator.js";
 
 export default class EloManager {
     constructor() {
         
         // TODO: Import from JSON
         const players = [
-            { id: 1, name: "Adam", score: 920 },
-            { id: 2, name: "Burns", score: 1040 },
-            { id: 3, name: "Jon", score: 1072 },
+            { id: 1, name: "Adam", score: 992 },
+            { id: 2, name: "Burns", score: 993 },
+            { id: 3, name: "Jon", score: 1144 },
             { id: 4, name: "Matt", score: 968 },
             { id: 5, name: "Durga", score: 1000 },
             { id: 6, name: "Joey", score: 1000 },
-            { id: 7, name: "John", score: 984 },
+            { id: 7, name: "John", score: 937 },
         ];
         
         this._playerList = PlayerList.initialize(players);
         this._team1 = new Team("team1");
         this._team2 = new Team("team2");
         this._playerLocations = new Map();
+        this._calculator = new Calculator(this._team1, this._team2);
 
         wireEvents(this);
     }
@@ -93,6 +95,7 @@ function handleDropEvent(ev, manager, team, player) {
 
     if (manager[team][player] !== undefined) {
         manager.playerList.reclaim(manager[team][player]);
+        manager._playerLocations.delete(manager[team][player]);
     }
     manager[team][player] = matchedPlayer;
     

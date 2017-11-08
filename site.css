@@ -4,25 +4,35 @@ body {
     text-align: center;
 }
 
+.hidden {
+    display: none;
+}
+
 playerList,
 player,
 team {
     display: block;
-    flex: 1 1 auto;
+}
+
+playerList {
+    padding: 5px;
 }
 
 player {
     padding: 5px;
-    margin: 5px;
+    margin: 5px 0;
+}
+
+playerList player {
     border-radius: 5px;
     border: 1px solid black;
 }
 
-team {
+.container {
     display: flex;
 }
 
-.player-display, .team-container {
+.flex {
     flex: 1 1 auto;
 }
 
@@ -32,19 +42,6 @@ team {
     padding: 5px;
 }
 
-/* .container {
-    flex: 1 1 auto;
-    border-radius: 5px;
-    border: 2px dotted blue;
-    padding: 5px;
-    margin: 5px;
-    display: flex;
-    flex-direction: column;
+.player-display {
+    margin: 0 5px;
 }
-
-.component {
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid black;
-    margin: 5px;
-} */

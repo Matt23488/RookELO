@@ -10,28 +10,9 @@ export default class TeamComponent extends Component {
         this._player2 = undefined;
         this._player1Container = getPlayerContainer(this, "player1");
         this._player2Container = getPlayerContainer(this, "player2");
-
-        // Move these to EloManager? Since some of the drag/drop flow has to be there,
-        // maybe I can move it all there, to keep it in one place. Will try that.
-        const player1Container = getPlayerContainer(this, "player1");
-        player1Container.addEventListener("dragover", ev => {
-            ev.preventDefault();
-        });
-        player1Container.addEventListener("drop", ev => {
-            ev.preventDefault();
-            const playerId = ev.dataTransfer.getData("text");
-            this.events.emit("addPlayer1", parseInt(playerId));
-        });
-
-        const player2Container = getPlayerContainer(this, "player2");
-        player2Container.addEventListener("dragover", ev => {
-            ev.preventDefault();
-        });
-        player2Container.addEventListener("drop", ev => {
-            ev.preventDefault();
-            const playerId = ev.dataTransfer.getData("text");
-            this.events.emit("addPlayer2", parseInt(playerId));
-        });
+        this._average = NaN;
+        this._transform = NaN;
+        this._expected = NaN;
     }
 
     get events() { return this._events; }
@@ -43,6 +24,8 @@ export default class TeamComponent extends Component {
         if (player !== undefined) {
             getPlayerContainer(this, "player1").appendChild(player.element);
         }
+        
+        this._events.emit("newPlayer");
     }
 
     get player2() { return this._player2; }
@@ -52,12 +35,40 @@ export default class TeamComponent extends Component {
         if (player !== undefined) {
             getPlayerContainer(this, "player2").appendChild(player.element);
         }
+        
+        this._events.emit("newPlayer");
     }
 
     get player1Container() { return this._player1Container; }
     get player2Container() { return this._player2Container; }
+
+    get average() { return this._average; }
+    set average(value) {
+        this._average = value;
+        this.element.getElementsByClassName("average-display").item(0).innerText = value;
+        getTeamSection(this, "average").classList.toggle("hidden", isNaN(value));
+        
+    }
+    
+    get transform() { return this._transform; }
+    set transform(value) {
+        this._transform = value;
+        this.element.getElementsByClassName("transform-display").item(0).innerText = value;
+        getTeamSection(this, "transform").classList.toggle("hidden", isNaN(value));
+    }
+    
+    get expected() { return this._expected; }
+    set expected(value) {
+        this._expected = value;
+        this.element.getElementsByClassName("expected-display").item(0).innerText = value;
+        getTeamSection(this, "expected").classList.toggle("hidden", isNaN(value));
+    }
 }
 
 function getPlayerContainer(team, playerSelection) {
     return team.element.getElementsByClassName(playerSelection).item(0).getElementsByClassName("player-container").item(0);
+}
+
+function getTeamSection(team, section) {
+    return team.element.getElementsByClassName(`${section}-section`).item(0);
 }
