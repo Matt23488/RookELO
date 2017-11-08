@@ -98,7 +98,7 @@ function wireEvents(manager) {
     });
 
     document.getElementById("addPlayerButton").addEventListener("click", ev => {
-
+        // TODO: Call the addPlayer() function
     });
 
     document.getElementById("startButton").addEventListener("click", ev => {
@@ -113,12 +113,20 @@ function wireEvents(manager) {
             winningTeam.element.removeEventListener("click", winningTeam.clickHandler);
             losingTeam.element.removeEventListener("click", losingTeam.clickHandler);
 
+            const winningPlayer1OldScore = winningTeam.player1.score;
+            const winningPlayer2OldScore = winningTeam.player2.score;
+            const losingPlayer1OldScore = losingTeam.player1.score;
+            const losingPlayer2OldScore = losingTeam.player2.score;
+
             winningTeam.player1.score = winningTeam.player1ScoreIfWon;
             winningTeam.player2.score = winningTeam.player2ScoreIfWon;
             losingTeam.player1.score = losingTeam.player1ScoreIfLoss;
             losingTeam.player2.score = losingTeam.player2ScoreIfLoss;
 
-            console.log(manager._playerLocations);
+            console.log(winningTeam.player1.name, winningPlayer1OldScore, "=>", winningTeam.player1.score);
+            console.log(winningTeam.player2.name, winningPlayer2OldScore, "=>", winningTeam.player2.score);
+            console.log(losingTeam.player1.name, losingPlayer1OldScore, "=>", losingTeam.player1.score);
+            console.log(losingTeam.player2.name, losingPlayer2OldScore, "=>", losingTeam.player2.score);
 
             manager.playerList.reclaim(winningTeam.player1);
             manager._playerLocations.delete(winningTeam.player1.id);
@@ -132,14 +140,11 @@ function wireEvents(manager) {
             manager.playerList.reclaim(losingTeam.player2);
             manager._playerLocations.delete(losingTeam.player2.id);
             losingTeam.player2 = undefined;
-            
-            console.log(manager._playerLocations);
         }
 
         function prepareTeam(team, otherTeam) {
             cover.appendChild(team.element);
             team.clickHandler = ev => {
-                console.log(team.player1.name, team.player2.name);
                 recordWin(team, otherTeam);
             };
 
@@ -231,7 +236,7 @@ function savePlayers(playerList) {
 }
 
 function addPlayer() {
-
+    // TODO: Code to open a dialog and ask a player's name, then add them to the player list goes here
 }
 
 function download(data, filename, type) {

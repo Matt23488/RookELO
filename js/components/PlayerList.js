@@ -8,6 +8,10 @@ export default class PlayerListComponent extends Component {
     }
 
     get players() { return this._players; }
+    get nextId() {
+        const sortedById = this._players.sort((a, b) => b.id - a.id);
+        return sortedById.length > 0 ? sortedById[0].id + 1 : 1;
+    }
 
     addPlayer(player) {
         const playerComponent = new Player(player);
