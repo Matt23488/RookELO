@@ -12,6 +12,7 @@ playerList,
 player,
 team {
     display: block;
+    z-index: 100;
 }
 
 playerList, team {
@@ -21,9 +22,17 @@ playerList, team {
     border: 1px solid black;
 }
 
+team {
+    padding-bottom: 20px;
+}
+
 player {
     padding: 5px;
     margin: 5px 0;
+}
+
+[draggable="true"] {
+    cursor: -webkit-grab;
 }
 
 playerList player {
@@ -47,4 +56,60 @@ playerList player {
 
 .player-display {
     margin: 0 5px;
+}
+
+nav {
+    display: flex;
+    height: 50px;
+    width: 100vw;
+}
+
+button {
+    flex: 1 1 auto;
+    font-size: 1.5em;
+    margin: 2px;
+}
+
+nav button:hover {
+    cursor: pointer;
+}
+
+.body-content {
+    position: absolute;
+    top: 70px;
+    width: 90vw;
+}
+
+#team1 {
+    background-color: #FAA;
+}
+
+#team2 {
+    background-color: #AAF;
+}
+
+cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    text-align: center;
+    display: flex;
+}
+
+cover team {
+    flex: 1 1 auto;
+    margin: 50px;
+    box-shadow: none;
+}
+
+cover team:hover {
+    cursor: pointer;
+    background-color: #AFA !important;
+}
+
+#startButton {
+    padding: 15px;
 }

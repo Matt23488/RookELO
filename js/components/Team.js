@@ -64,13 +64,13 @@ export default class TeamComponent extends Component {
     set transform(value) {
         this._transform = value;
         this.element.getElementsByClassName("transform-display").item(0).innerText = value;
-        getTeamSection(this, "transform").classList.toggle("HIDDEN", isNaN(value));
+        //getTeamSection(this, "transform").classList.toggle("HIDDEN", isNaN(value));
     }
     
     get expected() { return this._expected; }
     set expected(value) {
         this._expected = value;
-        this.element.getElementsByClassName("expected-display").item(0).innerText = value;
+        this.element.getElementsByClassName("expected-display").item(0).innerText = parseFloat(Math.round(value * 10000) / 100).toFixed(2);
         getTeamSection(this, "expected").classList.toggle("HIDDEN", isNaN(value));
     }
     

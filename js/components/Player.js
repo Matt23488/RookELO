@@ -7,6 +7,7 @@ export default class PlayerComponent extends Component {
         this._id = player.id;
         this.name = player.name;
         this.score = player.score;
+        this._isPlaying = false;
     }
 
     get id() { return this._id; };
@@ -22,4 +23,7 @@ export default class PlayerComponent extends Component {
         this._score = score;
         this._element.getElementsByClassName("score").item(0).innerText = score;
     }
+
+    get isPlaying() { return this._isPlaying; }
+    set isPlaying(value) { this._isPlaying = value; }
 }

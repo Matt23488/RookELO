@@ -20,14 +20,18 @@ export default class PlayerListComponent extends Component {
     }
 
     reclaim(player) {
-        this._element.appendChild(player.element);
+        player.isPlaying = false;
+        this.sort();
     }
 
-    static initialize(players) {
-        const playerList = new PlayerListComponent();
+    sort() {
+        this.players.filter(p => !p.isPlaying).sort((a, b) => b.score - a.score).forEach(p => this._element.appendChild(p.element));
+    }
+
+    initialize(players) {
         players.forEach(p => {
-            playerList.addPlayer(p);
+            this.addPlayer(p);
         });
-        return playerList;
+        this.sort();
     }
 }

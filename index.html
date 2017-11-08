@@ -4,129 +4,139 @@
         <title>Rook ELO</title>
         <link href="site.css" rel="stylesheet" />
     </head>
-    <body class="container">
+    <body>
+        <input type="file" id="fileInput" class="HIDDEN" />
+        <nav>
+            <button id="loadButton">Load</button>
+            <button id="saveButton">Save</button>
+            <button id="addPlayerButton" disabled>Add Player</button>
+        </nav>
+        <div class="container body-content">
+            <div>
+                <playerList>
+                    <h2>Player List</h2>
+                    <template id="playerTemplate">
+                        <player>
+                            <span class="name"></span>:
+                            <span class="score"></span>
+                        </player>
+                    </template>
+                </playerList>
+                <button id="startButton" class="HIDDEN">Start!</button>
+            </div>
 
-        <div>
-            <playerList>
-                <h2>Player List</h2>
-                <template id="playerTemplate">
-                    <player draggable="true">
-                        <span class="name"></span>:
-                        <span class="score"></span>
-                    </player>
-                </template>
-            </playerList>
+            <div class="flex" id="team1Container">
+                <h3>Team 1</h3>
+                <team id="team1">
+                    <div class="container">
+                        <div class="flex player1 player-display">
+                            <h4>Player 1</h4>
+                            <div class="player-container"></div>
+                        </div>
+                        <div class="flex player2 player-display">
+                            <h4>Player 2</h4>
+                            <div class="player-container"></div>
+                        </div>
+                    </div>
+                    <div class="average-section HIDDEN">
+                        <h4>Average: <span class="average-display"></span></h4>
+                    </div>
+                    <div class="transform-section HIDDEN">
+                        <h4>Transform: <span class="transform-display"></span></h4>
+                    </div>
+                    <div class="expected-section HIDDEN">
+                        <h4>Expected: <span class="expected-display"></span>%</h4>
+                    </div>
+                    <div class="hypothetical-section HIDDEN container">
+                        <div class="flex">
+                            <h4>If Won</h4>
+                            <span class="if-won-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>If Loss</h4>
+                            <span class="if-loss-display"></span>
+                        </div>
+                    </div>
+                    <div class="score-increase-section HIDDEN container">
+                        <div class="flex">
+                            <h4>P1 (+<span class="player1-increase-display"></span>)</h4>
+                            <span class="player1-new-score-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>P2 (+<span class="player2-increase-display"></span>)</h4>
+                            <span class="player2-new-score-display"></span>
+                        </div>
+                    </div>
+                    <div class="score-decrease-section HIDDEN container">
+                        <div class="flex">
+                            <h4>P1 (<span class="player1-decrease-display"></span>)</h4>
+                            <span class="player1-new-score-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>P2 (<span class="player2-decrease-display"></span>)</h4>
+                            <span class="player2-new-score-display"></span>
+                        </div>
+                    </div>
+                </team>
+            </div>
+
+            <div class="flex" id="team2Container">
+                <h3>Team 2</h3>
+                <team id="team2">
+                    <div class="container">
+                        <div class="flex player1 player-display">
+                            <h4>Player 1</h4>
+                            <div class="player-container"></div>
+                        </div>
+                        <div class="flex player2 player-display">
+                            <h4>Player 2</h4>
+                            <div class="player-container"></div>
+                        </div>
+                    </div>
+                    <div class="average-section HIDDEN">
+                        <h4>Average: <span class="average-display"></span></h4>
+                    </div>
+                    <div class="transform-section HIDDEN">
+                        <h4>Transform: <span class="transform-display"></span></h4>
+                    </div>
+                    <div class="expected-section HIDDEN">
+                        <h4>Expected: <span class="expected-display"></span>%</h4>
+                    </div>
+                    <div class="hypothetical-section HIDDEN container">
+                        <div class="flex">
+                            <h4>If Won</h4>
+                            <span class="if-won-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>If Loss</h4>
+                            <span class="if-loss-display"></span>
+                        </div>
+                    </div>
+                    <div class="score-increase-section HIDDEN container">
+                        <div class="flex">
+                            <h4>P1 (+<span class="player1-increase-display"></span>)</h4>
+                            <span class="player1-new-score-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>P2 (+<span class="player2-increase-display"></span>)</h4>
+                            <span class="player2-new-score-display"></span>
+                        </div>
+                    </div>
+                    <div class="score-decrease-section HIDDEN container">
+                        <div class="flex">
+                            <h4>P1 (<span class="player1-decrease-display"></span>)</h4>
+                            <span class="player1-new-score-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>P2 (<span class="player2-decrease-display"></span>)</h4>
+                            <span class="player2-new-score-display"></span>
+                        </div>
+                    </div>
+                </team>
+            </div>
         </div>
 
-        <div class="flex">
-            <h3>Team 1</h3>
-            <team id="team1">
-                <div class="container">
-                    <div class="flex player1 player-display">
-                        <h4>Player 1</h4>
-                        <div class="player-container"></div>
-                    </div>
-                    <div class="flex player2 player-display">
-                        <h4>Player 2</h4>
-                        <div class="player-container"></div>
-                    </div>
-                </div>
-                <div class="average-section HIDDEN">
-                    <h4>Average: <span class="average-display"></span></h4>
-                </div>
-                <div class="transform-section HIDDEN">
-                    <h4>Transform: <span class="transform-display"></span></h4>
-                </div>
-                <div class="expected-section HIDDEN">
-                    <h4>Expected: <span class="expected-display"></span></h4>
-                </div>
-                <div class="hypothetical-section HIDDEN container">
-                    <div class="flex">
-                        <h4>If Won</h4>
-                        <span class="if-won-display"></span>
-                    </div>
-                    <div class="flex">
-                        <h4>If Loss</h4>
-                        <span class="if-loss-display"></span>
-                    </div>
-                </div>
-                <div class="score-increase-section HIDDEN container">
-                    <div class="flex">
-                        <h4>P1 (+<span class="player1-increase-display"></span>)</h4>
-                        <span class="player1-new-score-display"></span>
-                    </div>
-                    <div class="flex">
-                        <h4>P2 (+<span class="player2-increase-display"></span>)</h4>
-                        <span class="player2-new-score-display"></span>
-                    </div>
-                </div>
-                <div class="score-decrease-section HIDDEN container">
-                    <div class="flex">
-                        <h4>P1 (<span class="player1-decrease-display"></span>)</h4>
-                        <span class="player1-new-score-display"></span>
-                    </div>
-                    <div class="flex">
-                        <h4>P2 (<span class="player2-decrease-display"></span>)</h4>
-                        <span class="player2-new-score-display"></span>
-                    </div>
-                </div>
-            </team>
-        </div>
-
-        <div class="flex">
-            <h3>Team 2</h3>
-            <team id="team2">
-                <div class="container">
-                    <div class="flex player1 player-display">
-                        <h4>Player 1</h4>
-                        <div class="player-container"></div>
-                    </div>
-                    <div class="flex player2 player-display">
-                        <h4>Player 2</h4>
-                        <div class="player-container"></div>
-                    </div>
-                </div>
-                <div class="average-section HIDDEN">
-                    <h4>Average: <span class="average-display"></span></h4>
-                </div>
-                <div class="transform-section HIDDEN">
-                    <h4>Transform: <span class="transform-display"></span></h4>
-                </div>
-                <div class="expected-section HIDDEN">
-                    <h4>Expected: <span class="expected-display"></span></h4>
-                </div>
-                <div class="hypothetical-section HIDDEN container">
-                    <div class="flex">
-                        <h4>If Won</h4>
-                        <span class="if-won-display"></span>
-                    </div>
-                    <div class="flex">
-                        <h4>If Loss</h4>
-                        <span class="if-loss-display"></span>
-                    </div>
-                </div>
-                <div class="score-increase-section HIDDEN container">
-                    <div class="flex">
-                        <h4>P1 (+<span class="player1-increase-display"></span>)</h4>
-                        <span class="player1-new-score-display"></span>
-                    </div>
-                    <div class="flex">
-                        <h4>P2 (+<span class="player2-increase-display"></span>)</h4>
-                        <span class="player2-new-score-display"></span>
-                    </div>
-                </div>
-                <div class="score-decrease-section HIDDEN container">
-                    <div class="flex">
-                        <h4>P1 (<span class="player1-decrease-display"></span>)</h4>
-                        <span class="player1-new-score-display"></span>
-                    </div>
-                    <div class="flex">
-                        <h4>P2 (<span class="player2-decrease-display"></span>)</h4>
-                        <span class="player2-new-score-display"></span>
-                    </div>
-                </div>
-            </team>
-        </div>
+        <cover class="HIDDEN" />
 
         <script type="module" src="js/site.js"></script>
     </body>
