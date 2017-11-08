@@ -4,8 +4,8 @@ body {
     text-align: center;
 }
 
-.hidden {
-    display: none;
+.HIDDEN {
+    display: none !important;
 }
 
 playerList,
@@ -14,8 +14,11 @@ team {
     display: block;
 }
 
-playerList {
+playerList, team {
     padding: 5px;
+    margin: 3px;
+    box-shadow: 3px 3px 5px grey;
+    border: 1px solid black;
 }
 
 player {
