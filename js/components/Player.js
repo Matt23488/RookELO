@@ -2,11 +2,11 @@ import Component from "./Component.js";
 import { importTemplate } from "../utilities.js";
 
 export default class PlayerComponent extends Component {
-    constructor(player) {
+    constructor(playerObj) {
         super(importTemplate("playerTemplate"));
-        this._id = player.id;
-        this.name = player.name;
-        this.score = player.score;
+        this._id = playerObj.id;
+        this.name = playerObj.name;
+        this.score = playerObj.score;
         this._isPlaying = false;
     }
 

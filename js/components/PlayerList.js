@@ -13,10 +13,11 @@ export default class PlayerListComponent extends Component {
         return sortedById.length > 0 ? sortedById[0].id + 1 : 1;
     }
 
-    addPlayer(player) {
-        const playerComponent = new Player(player);
+    addPlayer(playerObj) {
+        const playerComponent = new Player(playerObj);
         this._players.push(playerComponent);
         this._element.appendChild(playerComponent._element);
+        return playerComponent;
     }
 
     find(playerId) {
@@ -29,11 +30,14 @@ export default class PlayerListComponent extends Component {
     }
 
     sort() {
-        this.players.filter(p => !p.isPlaying).sort((a, b) => b.score - a.score).forEach(p => this._element.appendChild(p.element));
+        this.players
+            .filter(p => !p.isPlaying)
+            .sort((a, b) => b.score - a.score)
+            .forEach(p => this._element.appendChild(p.element));
     }
 
-    initialize(players) {
-        players.forEach(p => {
+    initialize(playerObjs) {
+        playerObjs.forEach(p => {
             this.addPlayer(p);
         });
         this.sort();

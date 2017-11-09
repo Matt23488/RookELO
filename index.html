@@ -9,18 +9,12 @@
         <nav>
             <button id="loadButton">Load</button>
             <button id="saveButton">Save</button>
-            <button id="addPlayerButton" class="HIDDEN" disabled>Add Player</button>
+            <button id="addPlayerButton">Add Player</button>
         </nav>
         <div class="container body-content">
             <div>
                 <playerList>
                     <h2>Player List</h2>
-                    <template id="playerTemplate">
-                        <player>
-                            <span class="name"></span>:
-                            <span class="score"></span>
-                        </player>
-                    </template>
                 </playerList>
                 <button id="startButton" class="HIDDEN">Start!</button>
             </div>
@@ -35,25 +29,6 @@
                         <div class="flex player2 player-display">
                             <h4>Player 2</h4>
                             <div class="player-container"></div>
-                        </div>
-                    </div>
-                    <div class="average-section HIDDEN">
-                        <h4>Average: <span class="average-display"></span></h4>
-                    </div>
-                    <div class="transform-section HIDDEN">
-                        <h4>Transform: <span class="transform-display"></span></h4>
-                    </div>
-                    <div class="expected-section HIDDEN">
-                        <h4>Expected: <span class="expected-display"></span>%</h4>
-                    </div>
-                    <div class="hypothetical-section HIDDEN container">
-                        <div class="flex">
-                            <h4>If Won</h4>
-                            <span class="if-won-display"></span>
-                        </div>
-                        <div class="flex">
-                            <h4>If Loss</h4>
-                            <span class="if-loss-display"></span>
                         </div>
                     </div>
                     <div class="score-increase-section HIDDEN container">
@@ -74,6 +49,25 @@
                         <div class="flex">
                             <h4>P2 (<span class="player2-decrease-display"></span>)</h4>
                             <span class="player2-new-score-display"></span>
+                        </div>
+                    </div>
+                    <div class="average-section HIDDEN">
+                        <h4>Average: <span class="average-display"></span></h4>
+                    </div>
+                    <div class="transform-section HIDDEN">
+                        <h4>Transform: <span class="transform-display"></span></h4>
+                    </div>
+                    <div class="expected-section HIDDEN">
+                        <h4>Expected: <span class="expected-display"></span>%</h4>
+                    </div>
+                    <div class="hypothetical-section HIDDEN container">
+                        <div class="flex">
+                            <h4>If Won</h4>
+                            <span class="if-won-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>If Loss</h4>
+                            <span class="if-loss-display"></span>
                         </div>
                     </div>
                 </team>
@@ -91,25 +85,6 @@
                             <div class="player-container"></div>
                         </div>
                     </div>
-                    <div class="average-section HIDDEN">
-                        <h4>Average: <span class="average-display"></span></h4>
-                    </div>
-                    <div class="transform-section HIDDEN">
-                        <h4>Transform: <span class="transform-display"></span></h4>
-                    </div>
-                    <div class="expected-section HIDDEN">
-                        <h4>Expected: <span class="expected-display"></span>%</h4>
-                    </div>
-                    <div class="hypothetical-section HIDDEN container">
-                        <div class="flex">
-                            <h4>If Won</h4>
-                            <span class="if-won-display"></span>
-                        </div>
-                        <div class="flex">
-                            <h4>If Loss</h4>
-                            <span class="if-loss-display"></span>
-                        </div>
-                    </div>
                     <div class="score-increase-section HIDDEN container">
                         <div class="flex">
                             <h4>P1 (+<span class="player1-increase-display"></span>)</h4>
@@ -130,11 +105,51 @@
                             <span class="player2-new-score-display"></span>
                         </div>
                     </div>
+                    <div class="average-section HIDDEN">
+                        <h4>Average: <span class="average-display"></span></h4>
+                    </div>
+                    <div class="transform-section HIDDEN">
+                        <h4>Transform: <span class="transform-display"></span></h4>
+                    </div>
+                    <div class="expected-section HIDDEN">
+                        <h4>Expected: <span class="expected-display"></span>%</h4>
+                    </div>
+                    <div class="hypothetical-section HIDDEN container">
+                        <div class="flex">
+                            <h4>If Won</h4>
+                            <span class="if-won-display"></span>
+                        </div>
+                        <div class="flex">
+                            <h4>If Loss</h4>
+                            <span class="if-loss-display"></span>
+                        </div>
+                    </div>
                 </team>
             </div>
         </div>
 
         <cover class="HIDDEN" />
+
+        <template id="playerTemplate">
+            <player>
+                <span class="name"></span><span class="colon">:</span>
+                <span class="score"></span>
+            </player>
+        </template>
+
+        <template id="modalTemplate">
+            <modal>
+                <modalWindow>
+                    <modalHeader>
+                        <span class="close">&times;</span>
+                    </modalHeader>
+                    <modalContent>
+
+                    </modalContent>
+                    <modalFooter></modalFooter>
+                </modalWindow>
+            </modal>
+        </template>
 
         <script type="module" src="js/site.js"></script>
     </body>

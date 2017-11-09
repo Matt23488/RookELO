@@ -1,27 +1,16 @@
 import PlayerList from "./components/PlayerList.js";
 import Team from "./components/Team.js";
 import Calculator from "./Calculator.js";
+import NewPlayerModal from "./components/NewPlayerModal.js";
 
 export default class EloManager {
     constructor() {
-        
-        // // TODO: Import from JSON
-        // const players = [
-        //     { id: 1, name: "Adam", score: 992 },
-        //     { id: 2, name: "Burns", score: 993 },
-        //     { id: 3, name: "Jon", score: 1144 },
-        //     { id: 4, name: "Matt", score: 968 },
-        //     { id: 5, name: "Durga", score: 1000 },
-        //     { id: 6, name: "Joey", score: 1000 },
-        //     { id: 7, name: "John", score: 937 },
-        // ];
-        
-        //this._playerList = PlayerList.initialize(players);
         this._playerList = new PlayerList();
         this._team1 = new Team("team1");
         this._team2 = new Team("team2");
         this._playerLocations = new Map();
         this._calculator = new Calculator(this._team1, this._team2);
+        this._newPlayerModal = new NewPlayerModal();
 
         wireEvents(this);
     }
@@ -66,9 +55,6 @@ function wireEvents(manager) {
     manager.team1.events.listen("newPlayer", () => checkIfGameCanStart(manager));
     manager.team2.events.listen("newPlayer", () => checkIfGameCanStart(manager));
 
-    // Players
-    wireEventsForPlayers(manager.playerList.players);
-
     // Player List
     manager.playerList.element.addEventListener("dragover", ev => {
         ev.preventDefault();
@@ -88,6 +74,18 @@ function wireEvents(manager) {
         }
     });
 
+    // Add Player
+    manager._newPlayerModal.events.listen("ok", () => {
+        const newPlayerObj = {
+            id: manager.playerList.nextId,
+            name: manager._newPlayerModal.playerName,
+            score: 1000
+        };
+
+        const newPlayer = manager.playerList.addPlayer(newPlayerObj);
+        wireEventsForPlayers([newPlayer]);
+    });
+
     // Buttons
     document.getElementById("loadButton").addEventListener("click", ev => {
         document.getElementById("fileInput").click();
@@ -98,7 +96,7 @@ function wireEvents(manager) {
     });
 
     document.getElementById("addPlayerButton").addEventListener("click", ev => {
-        // TODO: Call the addPlayer() function
+        manager._newPlayerModal.show();
     });
 
     document.getElementById("startButton").addEventListener("click", ev => {
@@ -235,9 +233,9 @@ function savePlayers(playerList) {
     download(JSON.stringify(obj), "RookELO.json", "text/plain;charset=utf-8");
 }
 
-function addPlayer() {
-    // TODO: Code to open a dialog and ask a player's name, then add them to the player list goes here
-}
+// function addPlayer() {
+//     // TODO: Code to open a dialog and ask a player's name, then add them to the player list goes here
+// }
 
 function download(data, filename, type) {
     const file = new Blob([data], {type: type});

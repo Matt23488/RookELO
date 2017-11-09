@@ -64,7 +64,6 @@ export default class TeamComponent extends Component {
     set transform(value) {
         this._transform = value;
         this.element.getElementsByClassName("transform-display").item(0).innerText = value;
-        //getTeamSection(this, "transform").classList.toggle("HIDDEN", isNaN(value));
     }
     
     get expected() { return this._expected; }
@@ -78,7 +77,6 @@ export default class TeamComponent extends Component {
     set ifWon(value) {
         this._ifWon = value;
         this.element.getElementsByClassName("if-won-display").item(0).innerText = value;
-        getTeamSection(this, "hypothetical").classList.toggle("HIDDEN", isNaN(value));
     }
 
     get ifLoss() { return this._ifLoss; }
