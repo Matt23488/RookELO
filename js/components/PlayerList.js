@@ -8,12 +8,9 @@ export default class PlayerListComponent extends Component {
     }
 
     get players() { return this._players; }
-    get nextId() {
-        const sortedById = this._players.sort((a, b) => b.id - a.id);
-        return sortedById.length > 0 ? sortedById[0].id + 1 : 1;
-    }
 
     addPlayer(playerObj) {
+        playerObj.id = getNextId(this);
         const playerComponent = new Player(playerObj);
         this._players.push(playerComponent);
         this._element.appendChild(playerComponent._element);
@@ -42,4 +39,14 @@ export default class PlayerListComponent extends Component {
         });
         this.sort();
     }
+
+    clear() {
+        this._players.forEach(p => p.element.remove());
+        this._players.length = 0;
+    }
+}
+
+function getNextId(playerList) {
+    const playersSortedById = playerList.players.sort((a, b) => b.id - a.id);
+    return playersSortedById.length > 0 ? playersSortedById[0].id + 1 : 1;
 }

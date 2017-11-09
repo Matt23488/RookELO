@@ -77,7 +77,6 @@ function wireEvents(manager) {
     // Add Player
     manager._newPlayerModal.events.listen("ok", () => {
         const newPlayerObj = {
-            id: manager.playerList.nextId,
             name: manager._newPlayerModal.playerName,
             score: 1000
         };
@@ -87,8 +86,25 @@ function wireEvents(manager) {
     });
 
     // Buttons
-    document.getElementById("loadButton").addEventListener("click", ev => {
+    const loadButton = document.getElementById("loadButton");
+    loadButton.addEventListener("click", ev => {
         document.getElementById("fileInput").click();
+    });
+    loadButton.addEventListener("dragover", ev => ev.preventDefault());
+    loadButton.addEventListener("drop", ev => {
+        ev.preventDefault();
+        let file;
+        if (ev.dataTransfer.items) {
+            for (let i = 0; i < ev.dataTransfer.items.length; i++) {
+                if (ev.dataTransfer.items[i].kind === "file") {
+                    file = ev.dataTransfer.items[i].getAsFile();
+                }
+            }
+        }
+        else {
+            file = ev.dataTransfer.files[0];
+        }
+        loadFile(file, manager);
     });
 
     document.getElementById("saveButton").addEventListener("click", ev => {
@@ -155,22 +171,29 @@ function wireEvents(manager) {
         removeDrag(manager.playerList.players);
     });
 
-    const fileInput = document.getElementById("fileInput")
+    const fileInput = document.getElementById("fileInput");
     fileInput.addEventListener("change", ev => {
+        if (fileInput.value === "") return;
+
         const file = ev.target.files[0];
 
-        if (file) {
-            const reader = new FileReader();
-            reader.addEventListener("load", loadEv => {
-                const contents = loadEv.target.result;
-                loadPlayers(manager, JSON.parse(contents));
-            });
-            reader.readAsText(file);
-        }
-        else {
-            alert("Failed to load file");
-        }
+        fileInput.value = "";
+        loadFile(file, manager);
     });
+}
+
+function loadFile(file, manager) {
+    if (file) {
+        const reader = new FileReader();
+        reader.addEventListener("load", ev => {
+            const contents = ev.target.result;
+            loadPlayers(manager, JSON.parse(contents));
+        });
+        reader.readAsText(file);
+    }
+    else {
+        alert("Failed to load file");
+    }
 }
 
 function wireEventsForPlayers(players) {
@@ -215,6 +238,12 @@ function handleDropEvent(ev, manager, team, player) {
 }
 
 function loadPlayers(manager, playerObj) {
+    manager._playerLocations.clear();
+    manager.playerList.clear();
+    manager.team1.player1 = undefined;
+    manager.team1.player2 = undefined;
+    manager.team2.player1 = undefined;
+    manager.team2.player2 = undefined;
     manager.playerList.initialize(playerObj.players);
     wireEventsForPlayers(manager.playerList.players);
 }
@@ -224,7 +253,6 @@ function savePlayers(playerList) {
 
     playerList.players.forEach(player => {
         obj.players.push({
-            id: player.id,
             name: player.name,
             score: player.score
         });
@@ -232,10 +260,6 @@ function savePlayers(playerList) {
 
     download(JSON.stringify(obj), "RookELO.json", "text/plain;charset=utf-8");
 }
-
-// function addPlayer() {
-//     // TODO: Code to open a dialog and ask a player's name, then add them to the player list goes here
-// }
 
 function download(data, filename, type) {
     const file = new Blob([data], {type: type});
