@@ -151,6 +151,16 @@
             </modal>
         </template>
 
+        <script type="text/javascript">
+            var googleLoaded = false;
+            function handleClientLoad() {
+                googleLoaded = true;
+            }
+        </script>
+        <script async defer src="https://apis.google.com/js/api.js"
+            onload="this.onload=function(){};handleClientLoad()"
+            onreadystatechange="if (this.readyState === 'complete') this.onload()">
+        </script>
         <script type="module" src="js/site.js"></script>
     </body>
 </html>

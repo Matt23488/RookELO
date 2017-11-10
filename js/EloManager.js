@@ -1,7 +1,9 @@
 import PlayerList from "./components/PlayerList.js";
 import Team from "./components/Team.js";
 import Calculator from "./Calculator.js";
-import NewPlayerModal from "./components/NewPlayerModal.js";
+import GoogleSession from "./OAuth.js";
+import NewPlayerModal from "./components/modal/NewPlayerModal.js";
+import LoadModal from "./components/modal/LoadModal.js";
 
 export default class EloManager {
     constructor() {
@@ -11,6 +13,9 @@ export default class EloManager {
         this._playerLocations = new Map();
         this._calculator = new Calculator(this._team1, this._team2);
         this._newPlayerModal = new NewPlayerModal();
+        this._loadModal = new LoadModal();
+        this._googleSession = new GoogleSession();
+        this._savedState = false;
 
         wireEvents(this);
     }
@@ -85,9 +90,30 @@ function wireEvents(manager) {
         wireEventsForPlayers([newPlayer]);
     });
 
+    // Load
+    manager._loadModal.events.listen("google", () => {
+        manager._googleSession.signIn();
+    });
+    manager._loadModal.events.listen("upload", () => {
+        document.getElementById("fileInput").click();
+    });
+
+    // Google Session
+    manager._googleSession.events.listen("signedIn", jsonFile => {
+        console.log("File", jsonFile);
+        manager._loadModal.hide();
+    });
+
+    // Window close
+    window.addEventListener("beforeunload", ev => {
+        manager._googleSession.signOut();
+    });
+
     // Buttons
     const loadButton = document.getElementById("loadButton");
     loadButton.addEventListener("click", ev => {
+        // TODO: Uncomment this once I figure out the API
+        //manager._loadModal.show();
         document.getElementById("fileInput").click();
     });
     loadButton.addEventListener("dragover", ev => ev.preventDefault());
