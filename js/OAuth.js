@@ -17,6 +17,7 @@ export default class GoogleSession {
     constructor() {
         this._events = new Events();
         this._sessionActive = false;
+        this._fileId = undefined;
 
         let initInterval = window.setInterval(() => {
             if (!window.googleLoaded) return;
@@ -42,6 +43,10 @@ export default class GoogleSession {
 
     signOut() {
         window.gapi.auth2.getAuthInstance().signOut();
+    }
+
+    saveState(state) {
+        modifyFileWithJSONContent(this._fileId, state);
     }
 }
 
@@ -75,18 +80,23 @@ function updateSigninStatus(session, isSignedIn) {
     eventObj.listen("finished", file => {
         if (file) {
             // TODO:
-            // window.gapi.client.drive.files.get({
-            //     fileId: file.id,
-            //     alt: "media"
-            // }).then(response => {
-            //     console.log("Get file result", response);
-            // });
-            console.log("deleting file because shit ass");
-            window.gapi.client.drive.files.delete({
-                fileId: file.id
+            session._fileId = file.id;
+            window.gapi.client.drive.files.get({
+                fileId: file.id,
+                alt: "media"
             }).then(response => {
-                console.log("Delete file result", response);
+                session.events.emit("signedIn", response.result);
             });
+
+
+
+            // console.log("deleting file because shit ass");
+            // window.gapi.client.drive.files.delete({
+            //     fileId: file.id
+            // }).then(response => {
+            //     console.log("Delete file result", response);
+            // });
+
         }
         else {
 
@@ -94,30 +104,36 @@ function updateSigninStatus(session, isSignedIn) {
             // I can't figure out how to do this. I will ask Reddit.
             console.log("Creating state.json file");
 
-            const fileMetadata = {
-                name: "state.json",
-                //parents: ["appDataFolder"],
-                //mimeType: "application/json",
-                //body: JSON.stringify({players:[]})
-            };
-            const media = {
-                mimeType: "application/json",
-                body: "{players:[]}"
-            };
-            const promise = window.gapi.client.drive.files.create({
-                resource: fileMetadata,
-                media: media,
-                fields: "id",
-                //body: JSON.stringify({players:[]})
-            }).then((response, b, c) => {
-                console.log("Created file result", response, b, c);
-                window.gapi.client.drive.files.get({
-                    fileId: response.result.id,
-                    alt: "media"
-                }).then(response => {
-                    console.log("Get file result", response);
-                });
+            const emptyState = {players:[]};
+            createFileWithJSONContent("state.json", emptyState, f => {
+                getStateFile(eventObj);
             });
+
+            // Leaving this code here because I dislike the way I'm having to do this currently.
+            // const fileMetadata = {
+            //     name: "state.json",
+            //     //parents: ["appDataFolder"],
+            //     //mimeType: "application/json",
+            //     //body: JSON.stringify({players:[]})
+            // };
+            // const media = {
+            //     mimeType: "application/json",
+            //     body: "{players:[]}"
+            // };
+            // const promise = window.gapi.client.drive.files.create({
+            //     resource: fileMetadata,
+            //     media: media,
+            //     fields: "id",
+            //     //body: JSON.stringify({players:[]})
+            // }).then((response, b, c) => {
+            //     console.log("Created file result", response, b, c);
+            //     window.gapi.client.drive.files.get({
+            //         fileId: response.result.id,
+            //         alt: "media"
+            //     }).then(response => {
+            //         console.log("Get file result", response);
+            //     });
+            // });
         }
     });
 
@@ -138,4 +154,77 @@ function getStateFile(eventObj, pageToken) {
         else if (response.result.nextPageToken) window.setTimeout(() => getStateFile(eventObj, response.result.nextPageToken), 0);
         else eventObj.emit("finished");
     });
+}
+
+function createFileWithJSONContent(fileName, jsonObj, callback) {
+    const boundary = '-------314159265358979323846';
+    const delimiter = "\r\n--" + boundary + "\r\n";
+    const close_delim = "\r\n--" + boundary + "--";
+
+    const contentType = "application/json";
+
+    const metadata = {
+        name: fileName,
+        mimeType: contentType
+    };
+
+    const multiPartRequestBody =
+        delimiter +
+        "Content-Type: application/json\r\n\r\n" +
+        JSON.stringify(metadata) +
+        delimiter +
+        "Content-Type: " + contentType + "\r\n\r\n" +
+        JSON.stringify(jsonObj) +
+        close_delim;
+
+    const request = window.gapi.client.request({
+        path: "/upload/drive/v3/files",
+        method: "POST",
+        params: {uploadType: "multipart"},
+        headers: {
+            "Content-Type": "multipart/related; boundary=\"" + boundary + "\""
+        },
+        body: multiPartRequestBody
+    });
+
+    if (!callback) {
+        callback = function(file) { console.log(file); };
+    }
+    request.execute(callback);
+}
+
+function modifyFileWithJSONContent(fileId, jsonObj, callback) {
+    const boundary = '-------314159265358979323846';
+    const delimiter = "\r\n--" + boundary + "\r\n";
+    const close_delim = "\r\n--" + boundary + "--";
+
+    const contentType = "application/json";
+
+    const metadata = {
+        mimeType: contentType
+    };
+
+    const multiPartRequestBody =
+        delimiter +
+        "Content-Type: application/json\r\n\r\n" +
+        JSON.stringify(metadata) +
+        delimiter +
+        "Content-Type: " + contentType + "\r\n\r\n" +
+        JSON.stringify(jsonObj) +
+        close_delim;
+
+    const request = window.gapi.client.request({
+        path: "/upload/drive/v3/files/" + fileId,
+        method: "PATCH",
+        params: {uploadType: "multipart"},
+        headers: {
+            "Content-Type": "multipart/related; boundary=\"" + boundary + "\""
+        },
+        body: multiPartRequestBody
+    });
+
+    if (!callback) {
+        callback = function(file) { console.log(file); };
+    }
+    request.execute(callback);
 }

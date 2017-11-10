@@ -99,8 +99,9 @@ function wireEvents(manager) {
     });
 
     // Google Session
-    manager._googleSession.events.listen("signedIn", jsonFile => {
-        console.log("File", jsonFile);
+    manager._googleSession.events.listen("signedIn", state => {
+        //console.log("File", state);
+        loadPlayers(manager, state);
         manager._loadModal.hide();
     });
 
@@ -113,8 +114,8 @@ function wireEvents(manager) {
     const loadButton = document.getElementById("loadButton");
     loadButton.addEventListener("click", ev => {
         // TODO: Uncomment this once I figure out the API
-        //manager._loadModal.show();
-        document.getElementById("fileInput").click();
+        manager._loadModal.show();
+        //document.getElementById("fileInput").click();
     });
     loadButton.addEventListener("dragover", ev => ev.preventDefault());
     loadButton.addEventListener("drop", ev => {
@@ -134,7 +135,7 @@ function wireEvents(manager) {
     });
 
     document.getElementById("saveButton").addEventListener("click", ev => {
-        savePlayers(manager.playerList);
+        savePlayers(manager);
     });
 
     document.getElementById("addPlayerButton").addEventListener("click", ev => {
@@ -274,17 +275,24 @@ function loadPlayers(manager, playerObj) {
     wireEventsForPlayers(manager.playerList.players);
 }
 
-function savePlayers(playerList) {
+function savePlayers(manager) {
     const obj = { players: [] };
 
-    playerList.players.forEach(player => {
+    manager.playerList.players.forEach(player => {
         obj.players.push({
             name: player.name,
             score: player.score
         });
     });
 
-    download(JSON.stringify(obj), "RookELO.json", "text/plain;charset=utf-8");
+
+    // TODO: If not using Google Drive, do the download instead
+    if (false) {
+        download(JSON.stringify(obj), "RookELO.json", "text/plain;charset=utf-8");
+    }
+    else {
+        manager._googleSession.saveState(obj);
+    }
 }
 
 function download(data, filename, type) {
