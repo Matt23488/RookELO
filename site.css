@@ -45,8 +45,17 @@ playerList player {
     text-align: center;
 }
 
+.container-v {
+    display: flex;
+    flex-flow: column;
+}
+
 .flex {
     flex: 1 1 auto;
+}
+
+.no-grow {
+    flex-grow: 0;
 }
 
 .player-container {
@@ -213,4 +222,10 @@ input[type="text"] {
 input[type="text"]:focus {
     outline: none;
     border-color: #0aa;
+}
+
+#startButton {
+    background-color: deeppink;
+    border: 1px solid gray;
+    box-shadow: 3px 3px 5px gray;
 }
