@@ -113,9 +113,7 @@ function wireEvents(manager) {
     // Buttons
     const loadButton = document.getElementById("loadButton");
     loadButton.addEventListener("click", ev => {
-        // TODO: Uncomment this once I figure out the API
         manager._loadModal.show();
-        //document.getElementById("fileInput").click();
     });
     loadButton.addEventListener("dragover", ev => ev.preventDefault());
     loadButton.addEventListener("drop", ev => {
@@ -285,9 +283,7 @@ function savePlayers(manager) {
         });
     });
 
-
-    // TODO: If not using Google Drive, do the download instead
-    if (false) {
+    if (!manager._googleSession.sessionActive) {
         download(JSON.stringify(obj), "RookELO.json", "text/plain;charset=utf-8");
     }
     else {

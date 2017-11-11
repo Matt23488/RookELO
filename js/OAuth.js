@@ -79,12 +79,12 @@ function updateSigninStatus(session, isSignedIn) {
 
     eventObj.listen("finished", file => {
         if (file) {
-            // TODO:
             session._fileId = file.id;
             window.gapi.client.drive.files.get({
                 fileId: file.id,
                 alt: "media"
             }).then(response => {
+                session._sessionActive = true;
                 session.events.emit("signedIn", response.result);
             });
 
@@ -118,7 +118,8 @@ function updateSigninStatus(session, isSignedIn) {
             // };
             // const media = {
             //     mimeType: "application/json",
-            //     body: "{players:[]}"
+            //     // body: "{players:[]}"
+            //     body: new Blob([JSON.stringify(emptyState)], { type: "application/json" })
             // };
             // const promise = window.gapi.client.drive.files.create({
             //     resource: fileMetadata,
@@ -143,7 +144,7 @@ function updateSigninStatus(session, isSignedIn) {
 
 function getStateFile(eventObj, pageToken) {
     window.gapi.client.drive.files.list({
-        //spaces: "appDataFolder",
+        // spaces: "appDataFolder",
         files: "nextPageToken, files(id, name)",
         pageSize: 10,
         pageToken
