@@ -121,6 +121,11 @@ function wireEvents(manager) {
         manager._googleSession.signOut();
     });
 
+    // Active game cover
+    document.getElementById("activeGameCover").addEventListener("click", ev => {
+        endGame(manager);
+    });
+
     // Buttons
     const loadButton = document.getElementById("loadButton");
     loadButton.addEventListener("click", ev => {
@@ -156,12 +161,7 @@ function wireEvents(manager) {
         cover.classList.remove("HIDDEN");
 
         function recordWin(winningTeam, losingTeam) {
-            cover.classList.add("HIDDEN");
-            addDrag(manager.playerList.players);
-            document.getElementById("team1Container").appendChild(manager.team1.element);
-            document.getElementById("team2Container").appendChild(manager.team2.element);
-            winningTeam.element.removeEventListener("click", winningTeam.clickHandler);
-            losingTeam.element.removeEventListener("click", losingTeam.clickHandler);
+            endGame(manager);
 
             const winningPlayer1OldScore = winningTeam.player1.score;
             const winningPlayer2OldScore = winningTeam.player2.score;
@@ -195,6 +195,8 @@ function wireEvents(manager) {
         function prepareTeam(team, otherTeam) {
             cover.appendChild(team.element);
             team.clickHandler = ev => {
+                ev.stopPropagation();
+                
                 recordWin(team, otherTeam);
             };
 
@@ -216,6 +218,14 @@ function wireEvents(manager) {
         fileInput.value = "";
         loadFile(file, manager);
     });
+}
+
+function endGame(manager) {
+    document.getElementById("activeGameCover").classList.add("HIDDEN");
+    addDrag(manager.playerList.players);
+    document.getElementById("team1Container").appendChild(manager.team1.element);
+    document.getElementById("team2Container").appendChild(manager.team2.element);
+    manager.teams.forEach(t => t.element.removeEventListener("click", t.clickHandler));
 }
 
 function loadFile(file, manager) {

@@ -122,6 +122,7 @@ cover {
     background-color: black;
     text-align: center;
     display: flex;
+    z-index: 999;
 }
 
 cover team {
