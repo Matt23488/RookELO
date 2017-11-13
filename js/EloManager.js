@@ -178,18 +178,7 @@ function wireEvents(manager) {
             console.log(losingTeam.player1.name, losingPlayer1OldScore, "=>", losingTeam.player1.score);
             console.log(losingTeam.player2.name, losingPlayer2OldScore, "=>", losingTeam.player2.score);
 
-            manager.playerList.reclaim(winningTeam.player1);
-            manager._playerLocations.delete(winningTeam.player1.id);
-            winningTeam.player1 = undefined;
-            manager.playerList.reclaim(winningTeam.player2);
-            manager._playerLocations.delete(winningTeam.player2.id);
-            winningTeam.player2 = undefined;
-            manager.playerList.reclaim(losingTeam.player1);
-            manager._playerLocations.delete(losingTeam.player1.id);
-            losingTeam.player1 = undefined;
-            manager.playerList.reclaim(losingTeam.player2);
-            manager._playerLocations.delete(losingTeam.player2.id);
-            losingTeam.player2 = undefined;
+            manager.activePlayers.forEach(p => reclaimPlayer(manager, p));
         }
 
         function prepareTeam(team, otherTeam) {
@@ -218,6 +207,15 @@ function wireEvents(manager) {
         fileInput.value = "";
         loadFile(file, manager);
     });
+}
+
+function reclaimPlayer(manager, player) {
+    const location = manager._playerLocations.get(player.id);
+    if (!location) return;
+
+    manager.playerList.reclaim(player);
+    manager._playerLocations.delete(player.id);
+    manager[location.team][location.player] = undefined;
 }
 
 function endGame(manager) {
