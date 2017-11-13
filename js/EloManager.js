@@ -5,8 +5,13 @@ import GoogleSession from "./OAuth.js";
 import NewPlayerModal from "./components/modal/NewPlayerModal.js";
 import LoadModal from "./components/modal/LoadModal.js";
 
+let instance;
+let calledViaStart = false;
+
 export default class EloManager {
     constructor() {
+        if (!calledViaStart) throw new Error("Please use the static start() method!");
+
         this._playerList = new PlayerList();
         this._team1 = new Team("team1");
         this._team2 = new Team("team2");
@@ -24,6 +29,13 @@ export default class EloManager {
     get team1() { return this._team1; }
     get team2() { return this._team2; }
     get teams() { return [this._team1, this._team2]; }
+    get activePlayers() { return [...this._team1.players, ...this._team2.players]; }
+
+    static start() {
+        calledViaStart = true;
+        if (!instance) instance = new EloManager();
+        calledViaStart = false;
+    }
 }
 
 function wireEvents(manager) {
@@ -100,7 +112,6 @@ function wireEvents(manager) {
 
     // Google Session
     manager._googleSession.events.listen("signedIn", state => {
-        //console.log("File", state);
         loadPlayers(manager, state);
         manager._loadModal.hide();
     });
@@ -306,9 +317,7 @@ function download(data, filename, type) {
 }
 
 function checkIfGameCanStart(manager) {
-    const canStart =
-        manager.team1.player1 !== undefined && manager.team1.player2 !== undefined &&
-        manager.team2.player1 !== undefined && manager.team2.player2 !== undefined;
+    const canStart = manager.activePlayers.every(p => p !== undefined);
 
     document.getElementById("startButton").classList.toggle("HIDDEN", !canStart);
 }

@@ -26,6 +26,7 @@ export default class TeamComponent extends Component {
     }
 
     get events() { return this._events; }
+    get players() { return [this._player1, this._player2]; }
 
     get player1() { return this._player1; }
     set player1(player) {
