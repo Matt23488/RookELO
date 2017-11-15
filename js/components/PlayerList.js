@@ -1,52 +1,59 @@
 import Component from "./Component.js";
 import Player from "./Player.js";
+import Events from "../Events.js";
+
+let self;
+let calledViaGetInstance = false;
+
+let _events;
+let _players;
 
 export default class PlayerListComponent extends Component {
     constructor() {
+        if (!calledViaGetInstance) throw new Error("You must use the static getInstance() method to get a reference to this class.");
+
         super(document.getElementsByTagName("playerList").item(0));
-        this._players = [];
+
+        _events = new Events();
+        _players = new Set();
+
+        wireEvents(this);
     }
 
-    get players() { return this._players; }
-
-    addPlayer(playerObj) {
-        playerObj.id = getNextId(this);
-        const playerComponent = new Player(playerObj);
-        this._players.push(playerComponent);
-        this._element.appendChild(playerComponent._element);
-        return playerComponent;
+    static getInstance() {
+        calledViaGetInstance = true;
+        if (!self) self = new PlayerListComponent();
+        calledViaGetInstance = false;
+        return self;
     }
 
-    find(playerId) {
-        return this.players.find(player => player.id === playerId);
-    }
+    get events() { return _events; }
 
-    reclaim(player) {
-        player.isPlaying = false;
-        this.sort();
+    addPlayer(player) {
+        this.append(player);
+        _players.add(player);
+        sort();
     }
-
-    sort() {
-        this.players
-            .filter(p => !p.isPlaying)
-            .sort((a, b) => b.score - a.score)
-            .forEach(p => this._element.appendChild(p.element));
-    }
-
-    initialize(playerObjs) {
-        playerObjs.forEach(p => {
-            this.addPlayer(p);
-        });
-        this.sort();
+    
+    removePlayer(player) {
+        _players.delete(player);
+        this.remove(player);
     }
 
     clear() {
-        this._players.forEach(p => p.element.remove());
-        this._players.length = 0;
+        _players.clear();
     }
 }
 
-function getNextId(playerList) {
-    const playersSortedById = playerList.players.sort((a, b) => b.id - a.id);
-    return playersSortedById.length > 0 ? playersSortedById[0].id + 1 : 1;
+function wireEvents(self) {
+    self.listen("dragover", ev => ev.preventDefault());
+    self.listen("drop", ev => {
+        self.events.emit("movePlayer", parseInt(ev.dataTransfer.getData("text")), self);
+    });
+}
+
+function sort() {
+    [..._players]
+        .sort((a, b) => b.score - a.score)
+        .forEach(p => self.append(p));
 }

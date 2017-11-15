@@ -1,148 +1,139 @@
 import Component from "./Component.js";
+import TeamPlayer from "./TeamPlayer.js";
 import Events from "../Events.js";
+
+const _privateMembers = new Map();
+const _container = Symbol("_container");
+const _events = Symbol("_events");
+const _player1 = Symbol("_player1");
+const _player2 = Symbol("_player2");
+const _average = Symbol("_average");
+const _transform = Symbol("_transform");
+const _expected = Symbol("_expected");
+const _ifWon = Symbol("_ifWon");
+const _ifLoss = Symbol("_ifLoss");
+
+const _fWireEvents = Symbol("_wireEvents()");
+const _fPlayerChangedHandler = Symbol("_playerChangedHandler()");
+const _fScoreIfWonUpdatedHandler = Symbol("_scoreIfWonUpdatedHandler()");
+const _fScoreIncreaseUpdatedHandler = Symbol("_scoreIncreaseUpdatedHandler()");
+const _fScoreIfLossUpdatedHandler = Symbol("_scoreIfLossUpdatedHandler()");
+const _fScoreDecreaseUpdatedHandler = Symbol("_scoreDecreaseUpdatedHandler()");
+
+function _(teamComponent, symbol) {
+    return _privateMembers.get(teamComponent).get(symbol);
+}
 
 export default class TeamComponent extends Component {
     constructor(id) {
-        super(document.getElementById(id));
+        super(`#${id}`);
 
-        this._events = new Events();
-        this._player1 = undefined;
-        this._player2 = undefined;
-        this._player1Container = getPlayerContainer(this, "player1");
-        this._player2Container = getPlayerContainer(this, "player2");
-        this._average = NaN;
-        this._transform = NaN;
-        this._expected = NaN;
-        this._ifWon = NaN;
-        this._ifLoss = NaN;
-        this._player1ScoreIncrease = NaN;
-        this._player2ScoreIncrease = NaN;
-        this._player1ScoreIfWon = NaN;
-        this._player2ScoreIfWon = NaN;
-        this._player1ScoreDecrease = NaN;
-        this._player2ScoreDecrease = NaN;
-        this._player1ScoreIfLoss = NaN;
-        this._player2ScoreIfLoss = NaN;
+        _privateMembers.set(this, new Map());
+
+        _privateMembers.get(this).set(_container, new Component(`#${id}Container`));
+        _privateMembers.get(this).set(_events, new Events());
+        _privateMembers.get(this).set(_player1, new TeamPlayer(this, "player1"));
+        _privateMembers.get(this).set(_player2, new TeamPlayer(this, "player2"));
+        _privateMembers.get(this).set(_average, NaN);
+        _privateMembers.get(this).set(_transform, NaN);
+        _privateMembers.get(this).set(_expected, NaN);
+        _privateMembers.get(this).set(_ifWon, NaN);
+        _privateMembers.get(this).set(_ifLoss, NaN);
+
+        _privateMembers.get(this).set(_fWireEvents, wireEventsFactory(this));
+        _privateMembers.get(this).set(_fPlayerChangedHandler, playerChangedFactory(this));
+        _privateMembers.get(this).set(_fScoreIfWonUpdatedHandler, scoreIfWonUpdatedHandlerFactory(this));
+        _privateMembers.get(this).set(_fScoreIncreaseUpdatedHandler, scoreIncreaseUpdatedHandlerFactory(this));
+        _privateMembers.get(this).set(_fScoreIfLossUpdatedHandler, scoreIfLossUpdatedHandlerFactory(this));
+        _privateMembers.get(this).set(_fScoreDecreaseUpdatedHandler, scoreDecreaseUpdatedHandlerFactory(this));
+
+        _(this, _fWireEvents)();
     }
 
-    get events() { return this._events; }
-    get players() { return [this._player1, this._player2]; }
+    get events() { return _(this, _events); }
+    get player1() { return _(this, _player1); }
+    get player2() { return _(this, _player2); }
+    get players() { return [this.player1, this.player2]; }
 
-    get player1() { return this._player1; }
-    set player1(player) {
-        this._player1 = player;
-
-        if (player !== undefined) {
-            getPlayerContainer(this, "player1").appendChild(player.element);
-        }
-        
-        this._events.emit("newPlayer");
-    }
-
-    get player2() { return this._player2; }
-    set player2(player) {
-        this._player2 = player;
-
-        if (player !== undefined) {
-            getPlayerContainer(this, "player2").appendChild(player.element);
-        }
-        
-        this._events.emit("newPlayer");
-    }
-
-    get player1Container() { return this._player1Container; }
-    get player2Container() { return this._player2Container; }
-
-    get average() { return this._average; }
+    get average() { return _(this, _average); }
     set average(value) {
-        this._average = value;
-        this.element.getElementsByClassName("average-display").item(0).innerText = value;
-        getTeamSection(this, "average").classList.toggle("HIDDEN", isNaN(value));
-        
+        _privateMembers.get(this).set(_average, value);
+        super.updateText(value, ".average-display");
+        super.setVisibility(!isNaN(value), ".average-section");
     }
     
-    get transform() { return this._transform; }
+    get transform() { return _(this, _transform); }
     set transform(value) {
-        this._transform = value;
-        this.element.getElementsByClassName("transform-display").item(0).innerText = value;
+        _privateMembers.get(this).set(_transform, value);
     }
     
-    get expected() { return this._expected; }
+    get expected() { return _(this, _expected); }
     set expected(value) {
-        this._expected = value;
-        this.element.getElementsByClassName("expected-display").item(0).innerText = parseFloat(Math.round(value * 10000) / 100).toFixed(2);
-        getTeamSection(this, "expected").classList.toggle("HIDDEN", isNaN(value));
+        _privateMembers.get(this).set(_expected, value);
+        super.updateText(parseFloat(Math.round(value * 10000) / 100).toFixed(2), ".expected-display");
+        super.setVisibility(!isNaN(value), ".expected-section");
     }
     
-    get ifWon() { return this._ifWon; }
+    get ifWon() { return _(this, _ifWon); }
     set ifWon(value) {
-        this._ifWon = value;
-        this.element.getElementsByClassName("if-won-display").item(0).innerText = value;
+        _privateMembers.get(this).set(_ifWon, value);
     }
 
-    get ifLoss() { return this._ifLoss; }
+    get ifLoss() { return _(this, _ifLoss); }
     set ifLoss(value) {
-        this._ifLoss = value;
-        this.element.getElementsByClassName("if-loss-display").item(0).innerText = value;
+        _privateMembers.get(this).set(_ifLoss, value);
     }
 
-    get player1ScoreIncrease() { return this._player1ScoreIncrease; }
-    set player1ScoreIncrease(value) {
-        this._player1ScoreIncrease = value;
-        this.element.getElementsByClassName("player1-increase-display").item(0).innerText = value;
-        getTeamSection(this, "score-increase").classList.toggle("HIDDEN", isNaN(value));
-    }
-
-    get player2ScoreIncrease() { return this._player2ScoreIncrease; }
-    set player2ScoreIncrease(value) {
-        this._player2ScoreIncrease = value;
-        this.element.getElementsByClassName("player2-increase-display").item(0).innerText = value;
-        getTeamSection(this, "score-increase").classList.toggle("HIDDEN", isNaN(value));
-    }
-
-    get player1ScoreIfWon() { return this._player1ScoreIfWon; }
-    set player1ScoreIfWon(value) {
-        this._player1ScoreIfWon = value;
-        getTeamSection(this, "score-increase").getElementsByClassName("player1-new-score-display").item(0).innerText = value;
-    }
-
-    get player2ScoreIfWon() { return this._player2ScoreIfWon; }
-    set player2ScoreIfWon(value) {
-        this._player2ScoreIfWon = value;
-        getTeamSection(this, "score-increase").getElementsByClassName("player2-new-score-display").item(0).innerText = value;
-    }
-
-    get player1ScoreDecrease() { return this._player1ScoreDecrease; }
-    set player1ScoreDecrease(value) {
-        this._player1ScoreDecrease = value;
-        this.element.getElementsByClassName("player1-decrease-display").item(0).innerText = value;
-        getTeamSection(this, "score-decrease").classList.toggle("HIDDEN", isNaN(value));
-    }
-
-    get player2ScoreDecrease() { return this._player2ScoreDecrease; }
-    set player2ScoreDecrease(value) {
-        this._player2ScoreDecrease = value;
-        this.element.getElementsByClassName("player2-decrease-display").item(0).innerText = value;
-        getTeamSection(this, "score-decrease").classList.toggle("HIDDEN", isNaN(value));
-    }
-
-    get player1ScoreIfLoss() { return this._player1ScoreIfLoss; }
-    set player1ScoreIfLoss(value) {
-        this._player1ScoreIfLoss = value;
-        getTeamSection(this, "score-decrease").getElementsByClassName("player1-new-score-display").item(0).innerText = value;
-    }
-
-    get player2ScoreIfLoss() { return this._player2ScoreIfLoss; }
-    set player2ScoreIfLoss(value) {
-        this._player2ScoreIfLoss = value;
-        getTeamSection(this, "score-decrease").getElementsByClassName("player2-new-score-display").item(0).innerText = value;
+    removeFromGame() {
+        _(this, _container).append(this);
     }
 }
 
-function getPlayerContainer(team, playerSelection) {
-    return team.element.getElementsByClassName(playerSelection).item(0).getElementsByClassName("player-container").item(0);
+function wireEventsFactory(self) {
+    return () => {
+        self.players.forEach(p => {
+            p.events.listen("movePlayer", playerId => {
+                self.events.emit("movePlayer", playerId, p);
+            });
+            p.events.listen("playerChanged", _(self, _fPlayerChangedHandler));
+            p.events.listen("scoreIfWonUpdated", _(self, _fScoreIfWonUpdatedHandler));
+            p.events.listen("scoreIncreaseUpdated", _(self, _fScoreIncreaseUpdatedHandler));
+            p.events.listen("scoreIfLossUpdated", _(self, _fScoreIfLossUpdatedHandler));
+            p.events.listen("scoreDecreaseUpdated", _(self, _fScoreDecreaseUpdatedHandler));
+        });
+    };
 }
 
-function getTeamSection(team, section) {
-    return team.element.getElementsByClassName(`${section}-section`).item(0);
+function playerChangedFactory(self) {
+    return () => {
+        self.events.emit("playerChanged");
+    };
+}
+
+function scoreIfWonUpdatedHandlerFactory(self) {
+    return (score, playerClass) => {
+        self.updateText(score, `.score-increase-section .${playerClass}.new-score-display`);
+        self.setVisibility(!isNaN(score), ".score-increase-section");
+    };
+}
+
+function scoreIncreaseUpdatedHandlerFactory(self) {
+    return (increase, playerClass) => {
+        self.updateText(increase, `.score-increase-section .${playerClass}.increase-display`);
+        self.setVisibility(!isNaN(increase), ".score-increase-section");
+    };
+}
+
+function scoreIfLossUpdatedHandlerFactory(self) {
+    return (score, playerClass) => {
+        self.updateText(score, `.score-decrease-section .${playerClass}.new-score-display`);
+        self.setVisibility(!isNaN(score), ".score-decrease-section");
+    };
+}
+
+function scoreDecreaseUpdatedHandlerFactory(self) {
+    return (decrease, playerClass) => {
+        self.updateText(decrease, `.score-decrease-section .${playerClass}.decrease-display`);
+        self.setVisibility(!isNaN(decrease), ".score-decrease-section");
+    };
 }

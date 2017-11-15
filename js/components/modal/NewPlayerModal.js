@@ -26,7 +26,3 @@ export default class NewPlayerModalComponent extends ModalComponent {
 function getPlayerNameInput(modal) {
     return modal.element.getElementsByClassName("playerName").item(0);
 }
-
-function getAddPlayerButton(modal) {
-    return modal.element.getElementsByClassName("okButton").item(0);
-}

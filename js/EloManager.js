@@ -1,237 +1,187 @@
+import Component from "./components/Component.js";
 import PlayerList from "./components/PlayerList.js";
 import Team from "./components/Team.js";
-import Calculator from "./Calculator.js";
-import GoogleSession from "./OAuth.js";
 import NewPlayerModal from "./components/modal/NewPlayerModal.js";
 import LoadModal from "./components/modal/LoadModal.js";
+import Button from "./components/Button.js";
+import Calculator from "./Calculator.js";
+import GoogleSession from "./OAuth.js";
+import PlayerManager from "./PlayerManager.js";
+import { preventDefault, getFileFromEvent } from "./utilities.js";
 
-let instance;
+let self;
 let calledViaStart = false;
+
+let _team1;
+let _team2;
+let _playerManager;
+let _newPlayerModal;
+let _loadModal;
+let _loadButton;
+let _signOutButton;
+let _saveButton;
+let _addPlayerButton;
+let _startButton;
+let _cover;
+let _fileInput;
+let _calculator;
+let _googleSession;
+let _savedState;
 
 export default class EloManager {
     constructor() {
         if (!calledViaStart) throw new Error("Please use the static start() method!");
 
-        this._playerList = new PlayerList();
-        this._team1 = new Team("team1");
-        this._team2 = new Team("team2");
-        this._playerLocations = new Map();
-        this._calculator = new Calculator(this._team1, this._team2);
-        this._newPlayerModal = new NewPlayerModal();
-        this._loadModal = new LoadModal();
-        this._googleSession = new GoogleSession();
-        this._savedState = false;
+        _team1 = new Team("team1");
+        _team2 = new Team("team2");
+        _playerManager = PlayerManager.getInstance(_team1, _team2);
+        _newPlayerModal = new NewPlayerModal();
+        _loadModal = new LoadModal();
+        _loadButton = new Button("#loadButton");
+        _signOutButton = new Button("#signOutButton");
+        _saveButton = new Button("#saveButton");
+        _addPlayerButton = new Button("#addPlayerButton");
+        _startButton = new Button("#startButton");
+        _cover = new Component("#activeGameCover");
+        _fileInput = new Component("#fileInput");
+        _calculator = Calculator.getInstance(_team1, _team2);
+        _googleSession = new GoogleSession();
+        _savedState = false;
 
         wireEvents(this);
     }
 
-    get playerList() { return this._playerList; }
-    get team1() { return this._team1; }
-    get team2() { return this._team2; }
-    get teams() { return [this._team1, this._team2]; }
-    get activePlayers() { return [...this._team1.players, ...this._team2.players]; }
+    get team1() { return _team1; }
+    get team2() { return _team2; }
+    get teams() { return [_team1, _team2]; }
 
     static start() {
         calledViaStart = true;
-        if (!instance) instance = new EloManager();
+        if (!self) self = new EloManager();
         calledViaStart = false;
     }
 }
 
-function wireEvents(manager) {
-    // Team 1 Player 1
-    manager.team1.player1Container.addEventListener("dragover", ev => {
-        ev.preventDefault();
-    });
-    manager.team1.player1Container.addEventListener("drop", ev => {
-        handleDropEvent(ev, manager, "team1", "player1");
-    });
-    // Team 1 Player 2
-    manager.team1.player2Container.addEventListener("dragover", ev => {
-        ev.preventDefault();
-    });
-    manager.team1.player2Container.addEventListener("drop", ev => {
-        handleDropEvent(ev, manager, "team1", "player2");
-    });
-    // Team 2 Player 1
-    manager.team2.player1Container.addEventListener("dragover", ev => {
-        ev.preventDefault();
-    });
-    manager.team2.player1Container.addEventListener("drop", ev => {
-        handleDropEvent(ev, manager, "team2", "player1");
-    });
-    // Team 2 Player 2
-    manager.team2.player2Container.addEventListener("dragover", ev => {
-        ev.preventDefault();
-    });
-    manager.team2.player2Container.addEventListener("drop", ev => {
-        handleDropEvent(ev, manager, "team2", "player2");
-    });
-
-    // Teams
-    manager.team1.events.listen("newPlayer", () => checkIfGameCanStart(manager));
-    manager.team2.events.listen("newPlayer", () => checkIfGameCanStart(manager));
-
-    // Player List
-    manager.playerList.element.addEventListener("dragover", ev => {
-        ev.preventDefault();
-    });
-    manager.playerList.element.addEventListener("drop", ev => {
-        ev.preventDefault();
-
-        const playerId = parseInt(ev.dataTransfer.getData("text"));
-        const matchedPlayer = manager.playerList.find(playerId);
-        
-        manager.playerList.reclaim(matchedPlayer);
-
-        const prevLocation = manager._playerLocations.get(matchedPlayer.id);
-        if (prevLocation !== undefined) {
-            manager[prevLocation.team][prevLocation.player] = undefined;
-            manager._playerLocations.delete(matchedPlayer.id);
-        }
-    });
+function wireEvents(self) {
+    self.teams.forEach(t => t.events.listen("playerChanged", () => checkIfGameCanStart()));
 
     // Add Player
-    manager._newPlayerModal.events.listen("ok", () => {
+    _newPlayerModal.events.listen("ok", () => {
         const newPlayerObj = {
-            name: manager._newPlayerModal.playerName,
+            name: _newPlayerModal.playerName,
             score: 1000
         };
 
-        const newPlayer = manager.playerList.addPlayer(newPlayerObj);
-        wireEventsForPlayers([newPlayer]);
+        _playerManager.addPlayer(newPlayerObj);
     });
 
     // Load
-    manager._loadModal.events.listen("google", () => {
-        manager._googleSession.signIn();
+    _loadModal.events.listen("google", () => {
+        _googleSession.signIn();
     });
-    manager._loadModal.events.listen("upload", () => {
+    _loadModal.events.listen("upload", () => {
         document.getElementById("fileInput").click();
     });
 
     // Google Session
-    manager._googleSession.events.listen("signedIn", state => {
-        loadPlayers(manager, state);
-        manager._loadModal.hide();
+    _googleSession.events.listen("signedIn", state => {
+        loadPlayers(state);
+        _loadModal.hide();
+        _loadButton.setVisibility(false);
+        _signOutButton.setVisibility(true);
     });
 
     // Window close
     window.addEventListener("beforeunload", ev => {
-        manager._googleSession.signOut();
+        _googleSession.signOut();
     });
 
+    // TODO: Get rid of the DOM manipulation. Again, too lazy after this huge refactor.
     // Active game cover
-    document.getElementById("activeGameCover").addEventListener("click", ev => {
-        endGame(manager);
-    });
+    document.getElementById("activeGameCover").addEventListener("click", ev => endGame());
 
     // Buttons
-    const loadButton = document.getElementById("loadButton");
-    loadButton.addEventListener("click", ev => {
-        manager._loadModal.show();
+    _loadButton.onClick(ev => _loadModal.show());
+    _loadButton.listen("dragover", preventDefault);
+    _loadButton.listen("drop", ev => {
+        preventDefault(ev);
+        const file = getFileFromEvent(ev);
+        loadFile(file);
     });
-    loadButton.addEventListener("dragover", ev => ev.preventDefault());
-    loadButton.addEventListener("drop", ev => {
-        ev.preventDefault();
-        let file;
-        if (ev.dataTransfer.items) {
-            for (let i = 0; i < ev.dataTransfer.items.length; i++) {
-                if (ev.dataTransfer.items[i].kind === "file") {
-                    file = ev.dataTransfer.items[i].getAsFile();
-                }
-            }
-        }
-        else {
-            file = ev.dataTransfer.files[0];
-        }
-        loadFile(file, manager);
+    _signOutButton.onClick(ev => {
+        _googleSession.signOut();
+        _playerManager.clear();
+        _signOutButton.setVisibility(false);
+        _loadButton.setVisibility(true);
     });
+    _saveButton.onClick(ev => savePlayers());
+    _addPlayerButton.onClick(ev => _newPlayerModal.show());
 
-    document.getElementById("saveButton").addEventListener("click", ev => {
-        savePlayers(manager);
-    });
-
-    document.getElementById("addPlayerButton").addEventListener("click", ev => {
-        manager._newPlayerModal.show();
-    });
-
-    document.getElementById("startButton").addEventListener("click", ev => {
-        const cover = document.getElementsByTagName("cover").item(0)
-        cover.classList.remove("HIDDEN");
+    _startButton.onClick(ev => {
+        _cover.setVisibility(true);
 
         function recordWin(winningTeam, losingTeam) {
-            endGame(manager);
+            endGame();
 
             const winningPlayer1OldScore = winningTeam.player1.score;
             const winningPlayer2OldScore = winningTeam.player2.score;
             const losingPlayer1OldScore = losingTeam.player1.score;
             const losingPlayer2OldScore = losingTeam.player2.score;
 
-            winningTeam.player1.score = winningTeam.player1ScoreIfWon;
-            winningTeam.player2.score = winningTeam.player2ScoreIfWon;
-            losingTeam.player1.score = losingTeam.player1ScoreIfLoss;
-            losingTeam.player2.score = losingTeam.player2ScoreIfLoss;
+            winningTeam.player1.score = winningTeam.player1.scoreIfWon;
+            winningTeam.player2.score = winningTeam.player2.scoreIfWon;
+            losingTeam.player1.score = losingTeam.player1.scoreIfLoss;
+            losingTeam.player2.score = losingTeam.player2.scoreIfLoss;
 
             console.log(winningTeam.player1.name, winningPlayer1OldScore, "=>", winningTeam.player1.score);
             console.log(winningTeam.player2.name, winningPlayer2OldScore, "=>", winningTeam.player2.score);
             console.log(losingTeam.player1.name, losingPlayer1OldScore, "=>", losingTeam.player1.score);
             console.log(losingTeam.player2.name, losingPlayer2OldScore, "=>", losingTeam.player2.score);
 
-            manager.activePlayers.forEach(p => reclaimPlayer(manager, p));
+            _playerManager.inactivatePlayers();
         }
 
         function prepareTeam(team, otherTeam) {
-            cover.appendChild(team.element);
+            _cover.append(team);
             team.clickHandler = ev => {
                 ev.stopPropagation();
                 
                 recordWin(team, otherTeam);
             };
 
-            team.element.addEventListener("click", team.clickHandler);
+            team.listen("click", team.clickHandler);
         }
 
-        prepareTeam(manager.team1, manager.team2);
-        prepareTeam(manager.team2, manager.team1);
+        prepareTeam(_team1, _team2);
+        prepareTeam(_team2, _team1);
         
-        removeDrag(manager.playerList.players);
+        _playerManager.makePlayersDraggable(false);
     });
 
-    const fileInput = document.getElementById("fileInput");
-    fileInput.addEventListener("change", ev => {
-        if (fileInput.value === "") return;
+    _fileInput.listen("change", ev => {
+        if (_fileInput.value === "") return;
 
         const file = ev.target.files[0];
-
-        fileInput.value = "";
-        loadFile(file, manager);
+        _fileInput.value = "";
+        loadFile(file);
     });
 }
 
-function reclaimPlayer(manager, player) {
-    const location = manager._playerLocations.get(player.id);
-    if (!location) return;
-
-    manager.playerList.reclaim(player);
-    manager._playerLocations.delete(player.id);
-    manager[location.team][location.player] = undefined;
+function endGame() {
+    _cover.setVisibility(false);
+    _playerManager.makePlayersDraggable(true);
+    self.teams.forEach(t => {
+        t.removeFromGame();
+        t.unListen("click", t.clickHandler);
+    });
 }
 
-function endGame(manager) {
-    document.getElementById("activeGameCover").classList.add("HIDDEN");
-    addDrag(manager.playerList.players);
-    document.getElementById("team1Container").appendChild(manager.team1.element);
-    document.getElementById("team2Container").appendChild(manager.team2.element);
-    manager.teams.forEach(t => t.element.removeEventListener("click", t.clickHandler));
-}
-
-function loadFile(file, manager) {
+function loadFile(file) {
     if (file) {
         const reader = new FileReader();
         reader.addEventListener("load", ev => {
             const contents = ev.target.result;
-            loadPlayers(manager, JSON.parse(contents));
+            loadPlayers(JSON.parse(contents));
         });
         reader.readAsText(file);
     }
@@ -240,73 +190,26 @@ function loadFile(file, manager) {
     }
 }
 
-function wireEventsForPlayers(players) {
-    addDrag(players);
-    players.forEach(player => {
-        player.element.addEventListener("dragstart", ev => {
-            ev.dataTransfer.setData("text", player.id);
-        });
-    });
+function loadPlayers(playersObj) {
+    _playerManager.clear();
+    _playerManager.initialize(playersObj.players);
 }
 
-function addDrag(players) {
-    players.forEach(player => {
-        player.element.setAttribute("draggable", "true");
-    });
-}
-
-function removeDrag(players) {
-    players.forEach(player => {
-        player.element.setAttribute("draggable", "false");
-    });
-}
-
-function handleDropEvent(ev, manager, team, player) {
-    ev.preventDefault();
-
-    const playerId = parseInt(ev.dataTransfer.getData("text"));
-    const matchedPlayer = manager.playerList.find(playerId);
-
-    if (manager[team][player] !== undefined) {
-        manager.playerList.reclaim(manager[team][player]);
-        manager._playerLocations.delete(manager[team][player].id);
-    }
-    manager[team][player] = matchedPlayer;
-    matchedPlayer.isPlaying = true;
-    
-    const prevLocation = manager._playerLocations.get(matchedPlayer.id);
-    if (prevLocation !== undefined) {
-        manager[prevLocation.team][prevLocation.player] = undefined;
-    }
-    manager._playerLocations.set(matchedPlayer.id, { team, player });
-}
-
-function loadPlayers(manager, playerObj) {
-    manager._playerLocations.clear();
-    manager.playerList.clear();
-    manager.team1.player1 = undefined;
-    manager.team1.player2 = undefined;
-    manager.team2.player1 = undefined;
-    manager.team2.player2 = undefined;
-    manager.playerList.initialize(playerObj.players);
-    wireEventsForPlayers(manager.playerList.players);
-}
-
-function savePlayers(manager) {
+function savePlayers() {
     const obj = { players: [] };
 
-    manager.playerList.players.forEach(player => {
+    _playerManager.players.forEach(p => {
         obj.players.push({
-            name: player.name,
-            score: player.score
+            name: p.name,
+            score: p.score
         });
     });
 
-    if (!manager._googleSession.sessionActive) {
+    if (!_googleSession.sessionActive) {
         download(JSON.stringify(obj), "RookELO.json", "text/plain;charset=utf-8");
     }
     else {
-        manager._googleSession.saveState(obj);
+        _googleSession.saveState(obj);
     }
 }
 
@@ -324,8 +227,6 @@ function download(data, filename, type) {
     }
 }
 
-function checkIfGameCanStart(manager) {
-    const canStart = manager.activePlayers.every(p => p !== undefined);
-
-    document.getElementById("startButton").classList.toggle("HIDDEN", !canStart);
+function checkIfGameCanStart() {
+    _startButton.setVisibility(_playerManager.teamsAreFull());
 }

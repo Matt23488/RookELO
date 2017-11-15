@@ -43,6 +43,7 @@ export default class GoogleSession {
 
     signOut() {
         window.gapi.auth2.getAuthInstance().signOut();
+        this._sessionActive = false;
     }
 
     saveState(state) {
