@@ -90,6 +90,8 @@ function wireEventsFactory(self) {
     return () => {
         self.listen("dragover", ev => ev.preventDefault());
         self.listen("drop", ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
             self.events.emit("movePlayer", parseInt(ev.dataTransfer.getData("text")), self);
         });
     };

@@ -48,6 +48,8 @@ export default class PlayerListComponent extends Component {
 function wireEvents(self) {
     self.listen("dragover", ev => ev.preventDefault());
     self.listen("drop", ev => {
+        ev.preventDefault();
+        ev.stopPropagation();
         self.events.emit("movePlayer", parseInt(ev.dataTransfer.getData("text")), self);
     });
 }

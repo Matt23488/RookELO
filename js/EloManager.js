@@ -110,6 +110,7 @@ function wireEvents(self) {
     _loadButton.listen("dragover", preventDefault);
     _loadButton.listen("drop", ev => {
         preventDefault(ev);
+        ev.stopPropagation();
         const file = getFileFromEvent(ev);
         loadFile(file);
     });
