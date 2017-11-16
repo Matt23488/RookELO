@@ -12,7 +12,6 @@ export default class Component {
         const parentElement = parentComponent ? _(parentComponent, _element) : document;
 
         _(this).set(_events, new Map());
-        _(this).set(_fGetElementFromSelector, getElementFromSelectorFactory(this));
         
         let element;
 
@@ -25,14 +24,15 @@ export default class Component {
         }
 
         _(this).set(_element, element);
+        _(this).set(_fGetElementFromSelector, getElementFromSelectorFactory(this));
     }
 
     // TODO: I need to remove this. It's referenced in NewPlayerModal.
     // I'm just too lazy to do it now after this major refactor.
-    get element() { return _(this, _element); }
+    //get element() { return _(this, _element); }
 
-    get value() { return _(this, _element).value; }
-    set value(value) { _(this).set(_element, value); }
+    // get value() { return _(this, _element).value; }
+    // set value(value) { _(this).set(_element, value); }
 
     get style() { return _(this, _element).style; }
     get classList() { return _(this, _element).classList; }
@@ -87,6 +87,18 @@ export default class Component {
 
     setAttribute(attributeName, value, selector) {
         _(this, _fGetElementFromSelector)(selector).setAttribute(attributeName, value);
+    }
+
+    focus(selector) {
+        _(this, _fGetElementFromSelector)(selector).focus();
+    }
+
+    getValue(selector) {
+        return _(this, _fGetElementFromSelector)(selector).value;
+    }
+
+    setValue(value, selector) {
+        _(this, _fGetElementFromSelector)(selector).value = value;
     }
 }
 

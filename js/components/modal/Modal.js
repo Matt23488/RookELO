@@ -9,7 +9,6 @@ const _events = Symbol("_events");
 const _closeButton = Symbol("_closeButton");
 const _buttons = Symbol("_buttons");
 const _content = Symbol("_content");
-const _shown = Symbol("_shown");
 
 const _body = new Component(document.body);
 
@@ -21,9 +20,10 @@ export default class ModalComponent extends Component {
         _(this).set(_closeButton, new Component(".close", this));
         _(this).set(_buttons, new Map());
         _(this).set(_content, "");
-        _(this).set(_shown, false);
 
         _(this, _closeButton).listen("click", ev => this.hide());
+
+        _body.append(this);
     }
 
     get text() { return _(this, _content); }
@@ -66,14 +66,10 @@ export default class ModalComponent extends Component {
     }
 
     show() {
-        _body.append(this);
-        _(this).set(_shown, true);
+        super.setVisibility(true);
     }
 
     hide() {
-        if (_(this, _shown)) {
-            _body.remove(this);
-            _(this).set(_shown, false);
-        }
+        super.setVisibility(false);
     }
 }

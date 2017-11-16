@@ -84,6 +84,7 @@ function wireEvents(self) {
         _googleSession.signIn();
     });
     _loadModal.events.listen("upload", () => {
+        // Still need to replace this with a Component.
         document.getElementById("fileInput").click();
     });
 
@@ -101,9 +102,8 @@ function wireEvents(self) {
         _googleSession.signOut();
     });
 
-    // TODO: Get rid of the DOM manipulation. Again, too lazy after this huge refactor.
-    // Active game cover
-    document.getElementById("activeGameCover").addEventListener("click", ev => endGame());
+    // Cancel game
+    _cover.listen("click", ev => endGame());
 
     // Buttons
     _loadButton.onClick(ev => _loadModal.show());
@@ -206,6 +206,7 @@ function loadFile(file) {
 }
 
 function loadPlayers(playersObj) {
+    _startButton.setVisibility(false);
     _playerManager.clear();
     _playerManager.initialize(playersObj.players);
     _toast.displayMessage("Loaded ELO state successfully!", ToastType.success);

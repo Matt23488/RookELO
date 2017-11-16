@@ -1,3 +1,4 @@
+import Component from "../Component.js";
 import ModalComponent from "./Modal.js";
 
 export default class NewPlayerModalComponent extends ModalComponent {
@@ -6,23 +7,19 @@ export default class NewPlayerModalComponent extends ModalComponent {
         super.html = "Enter the new player's name:<br /><br /><input type='text' class='playerName' />";
         
         const okButton = super.addButton("okButton", "Add Player", "ok", true);
-        getPlayerNameInput(this).addEventListener("keypress", ev => {
+        super.listen("keypress", ev => {
             if (ev.keyCode === 13) {
                 okButton.click();
             }
-        });
+        }, ".playerName");
     }
 
-    get playerName() { return getPlayerNameInput(this).value; }
-    set playerName(value) { getPlayerNameInput(this).value = value; }
+    get playerName() { return super.getValue(".playerName"); }
+    set playerName(value) { super.setValue(value, ".playerName"); }
 
     show() {
         this.playerName = "";
         super.show();
-        getPlayerNameInput(this).focus();
+        super.focus(".playerName");
     }
-}
-
-function getPlayerNameInput(modal) {
-    return modal.element.getElementsByClassName("playerName").item(0);
 }
