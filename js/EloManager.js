@@ -118,6 +118,7 @@ function wireEvents(self) {
         _googleSession.signOut();
         _playerManager.clear();
         _signOutButton.setVisibility(false);
+        _startButton.setVisibility(false);
         _loadButton.setVisibility(true);
         _toast.displayMessage(`Sign out successful.`);
     });
