@@ -62,9 +62,7 @@ export default class PlayerManager {
             _playerLocations.get(p.id).removePlayer(p);
             p.remove();
         });
-        //_players.length = 0;
         _players.clear();
-        //_playerLocations.forEach(l => l.removePlayer());
         _playerLocations.clear();
         _playerList.clear();
     }

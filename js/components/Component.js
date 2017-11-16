@@ -1,20 +1,21 @@
-const _privateMembers = new Map();
+import { privateAccessorFactory } from "../utilities.js";
+
+const _ = privateAccessorFactory();
 
 const _element = Symbol("_element");
 const _events = Symbol("_events");
 
 const _fGetElementFromSelector = Symbol("_getElementFromSelector()");
 
-function _(component, symbol) {
-    return _privateMembers.get(component).get(symbol);
-}
-
 export default class Component {
     constructor(elementOrSelector, parentComponent) {
         const parentElement = parentComponent ? _(parentComponent, _element) : document;
-        _privateMembers.set(this, new Map());
-        _privateMembers.get(this).set(_events, new Map());
-        _privateMembers.get(this).set(_fGetElementFromSelector, getElementFromSelectorFactory(this));
+        
+        _.initialize(this);
+
+        _(this).set(_events, new Map());
+        _(this).set(_fGetElementFromSelector, getElementFromSelectorFactory(this));
+        
         let element;
 
 
@@ -25,7 +26,7 @@ export default class Component {
             element = parentElement.querySelector(elementOrSelector);
         }
 
-        _privateMembers.get(this).set(_element, element);
+        _(this).set(_element, element);
     }
 
     // TODO: I need to remove this. It's referenced in NewPlayerModal.
@@ -33,7 +34,7 @@ export default class Component {
     get element() { return _(this, _element); }
 
     get value() { return _(this, _element).value; }
-    set value(value) { _privateMembers.get(this).set(_element, value); }
+    set value(value) { _(this).set(_element, value); }
 
     append(child, selector) {
         _(this, _fGetElementFromSelector)(selector).appendChild(_(child, _element));

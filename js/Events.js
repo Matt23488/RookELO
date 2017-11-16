@@ -1,16 +1,14 @@
-const _privateMembers = new Map();
+import { privateAccessorFactory } from "./utilities.js";
+
+const _ = privateAccessorFactory();
 
 const _listeners = Symbol("_listeners");
 
-function _(self, symbol) {
-    return _privateMembers.get(self).get(symbol);
-}
-
 export default class Events {
     constructor() {
-        _privateMembers.set(this, new Map());
+        _.initialize(this);
 
-        _privateMembers.get(this).set(_listeners, new Set());
+        _(this).set(_listeners, new Set());
     }
 
     listen(name, callback) {

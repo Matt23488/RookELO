@@ -1,8 +1,10 @@
 import Component from "./Component.js";
 import TeamPlayer from "./TeamPlayer.js";
 import Events from "../Events.js";
+import { privateAccessorFactory } from "../utilities.js";
 
-const _privateMembers = new Map();
+const _ = privateAccessorFactory();
+
 const _container = Symbol("_container");
 const _events = Symbol("_events");
 const _player1 = Symbol("_player1");
@@ -20,32 +22,28 @@ const _fScoreIncreaseUpdatedHandler = Symbol("_scoreIncreaseUpdatedHandler()");
 const _fScoreIfLossUpdatedHandler = Symbol("_scoreIfLossUpdatedHandler()");
 const _fScoreDecreaseUpdatedHandler = Symbol("_scoreDecreaseUpdatedHandler()");
 
-function _(teamComponent, symbol) {
-    return _privateMembers.get(teamComponent).get(symbol);
-}
-
 export default class TeamComponent extends Component {
     constructor(id) {
         super(`#${id}`);
 
-        _privateMembers.set(this, new Map());
+        _.initialize(this);
 
-        _privateMembers.get(this).set(_container, new Component(`#${id}Container`));
-        _privateMembers.get(this).set(_events, new Events());
-        _privateMembers.get(this).set(_player1, new TeamPlayer(this, "player1"));
-        _privateMembers.get(this).set(_player2, new TeamPlayer(this, "player2"));
-        _privateMembers.get(this).set(_average, NaN);
-        _privateMembers.get(this).set(_transform, NaN);
-        _privateMembers.get(this).set(_expected, NaN);
-        _privateMembers.get(this).set(_ifWon, NaN);
-        _privateMembers.get(this).set(_ifLoss, NaN);
+        _(this).set(_container, new Component(`#${id}Container`));
+        _(this).set(_events, new Events());
+        _(this).set(_player1, new TeamPlayer(this, "player1"));
+        _(this).set(_player2, new TeamPlayer(this, "player2"));
+        _(this).set(_average, NaN);
+        _(this).set(_transform, NaN);
+        _(this).set(_expected, NaN);
+        _(this).set(_ifWon, NaN);
+        _(this).set(_ifLoss, NaN);
 
-        _privateMembers.get(this).set(_fWireEvents, wireEventsFactory(this));
-        _privateMembers.get(this).set(_fPlayerChangedHandler, playerChangedFactory(this));
-        _privateMembers.get(this).set(_fScoreIfWonUpdatedHandler, scoreIfWonUpdatedHandlerFactory(this));
-        _privateMembers.get(this).set(_fScoreIncreaseUpdatedHandler, scoreIncreaseUpdatedHandlerFactory(this));
-        _privateMembers.get(this).set(_fScoreIfLossUpdatedHandler, scoreIfLossUpdatedHandlerFactory(this));
-        _privateMembers.get(this).set(_fScoreDecreaseUpdatedHandler, scoreDecreaseUpdatedHandlerFactory(this));
+        _(this).set(_fWireEvents, wireEventsFactory(this));
+        _(this).set(_fPlayerChangedHandler, playerChangedFactory(this));
+        _(this).set(_fScoreIfWonUpdatedHandler, scoreIfWonUpdatedHandlerFactory(this));
+        _(this).set(_fScoreIncreaseUpdatedHandler, scoreIncreaseUpdatedHandlerFactory(this));
+        _(this).set(_fScoreIfLossUpdatedHandler, scoreIfLossUpdatedHandlerFactory(this));
+        _(this).set(_fScoreDecreaseUpdatedHandler, scoreDecreaseUpdatedHandlerFactory(this));
 
         _(this, _fWireEvents)();
     }
@@ -57,31 +55,31 @@ export default class TeamComponent extends Component {
 
     get average() { return _(this, _average); }
     set average(value) {
-        _privateMembers.get(this).set(_average, value);
+        _(this).set(_average, value);
         super.updateText(value, ".average-display");
         super.setVisibility(!isNaN(value), ".average-section");
     }
     
     get transform() { return _(this, _transform); }
     set transform(value) {
-        _privateMembers.get(this).set(_transform, value);
+        _(this).set(_transform, value);
     }
     
     get expected() { return _(this, _expected); }
     set expected(value) {
-        _privateMembers.get(this).set(_expected, value);
+        _(this).set(_expected, value);
         super.updateText(parseFloat(Math.round(value * 10000) / 100).toFixed(2), ".expected-display");
         super.setVisibility(!isNaN(value), ".expected-section");
     }
     
     get ifWon() { return _(this, _ifWon); }
     set ifWon(value) {
-        _privateMembers.get(this).set(_ifWon, value);
+        _(this).set(_ifWon, value);
     }
 
     get ifLoss() { return _(this, _ifLoss); }
     set ifLoss(value) {
-        _privateMembers.get(this).set(_ifLoss, value);
+        _(this).set(_ifLoss, value);
     }
 
     removeFromGame() {

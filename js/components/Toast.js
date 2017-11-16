@@ -1,5 +1,19 @@
-// TODO:
-// This will contain a way to show popup messages.
-// Probably need a ToastManager class as well, since I will
-// need a way to make sure all toast messages are displayed
-// at once, etc
+let manager;
+let calledViaGetInstance = false;
+
+export default class ToastManager {
+    constructor() {
+        if (!calledViaGetInstance) throw new Error("You must use the static getInstance() method to get a reference to this class.");
+    }
+
+    static getInstance() {
+        calledViaGetInstance = true;
+        if (!manager) manager = new ToastManager();
+        calledViaGetInstance = false;
+        return manager;
+    }
+}
+
+// class ToastMessage {
+
+// }

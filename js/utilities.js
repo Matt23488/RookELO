@@ -17,3 +17,17 @@ export function getFileFromEvent(ev) {
     }
     return file;
 }
+
+export function privateAccessorFactory() {
+    const privateMembers = new Map();
+    const _ = (self, symbol) => {
+        if (symbol) return privateMembers.get(self).get(symbol);
+        else        return privateMembers.get(self);
+    };
+
+    _.initialize = instance => {
+        privateMembers.set(instance, new Map());
+    };
+
+    return _;
+}

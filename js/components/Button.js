@@ -1,20 +1,17 @@
 import Component from "./Component.js";
+import { privateAccessorFactory } from "../utilities.js";
 
-const _privateMembers = new Map();
+const _ = privateAccessorFactory();
 
 const _callbacks = Symbol("_callback");
-
-function _(self, symbol) {
-    return _privateMembers.get(self).get(symbol);
-}
 
 export default class ButtonComponent extends Component {
     constructor(selector) {
         super(selector);
 
-        _privateMembers.set(this, new Map());
+        _.initialize(this);
 
-        _privateMembers.get(this).set(_callbacks, new Set());
+        _(this).set(_callbacks, new Set());
 
         super.listen("click", ev => {
             _(this, _callbacks).forEach(callback => {
