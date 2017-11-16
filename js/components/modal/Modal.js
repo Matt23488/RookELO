@@ -17,8 +17,6 @@ export default class ModalComponent extends Component {
     constructor() {
         super(importTemplate("modalTemplate"));
 
-        _.initialize(this);
-
         _(this).set(_events, new Events());
         _(this).set(_closeButton, new Component(".close", this));
         _(this).set(_buttons, new Map());

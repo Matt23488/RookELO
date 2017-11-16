@@ -26,8 +26,6 @@ export default class TeamComponent extends Component {
     constructor(id) {
         super(`#${id}`);
 
-        _.initialize(this);
-
         _(this).set(_container, new Component(`#${id}Container`));
         _(this).set(_events, new Events());
         _(this).set(_player1, new TeamPlayer(this, "player1"));

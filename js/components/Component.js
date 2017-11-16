@@ -10,8 +10,6 @@ const _fGetElementFromSelector = Symbol("_getElementFromSelector()");
 export default class Component {
     constructor(elementOrSelector, parentComponent) {
         const parentElement = parentComponent ? _(parentComponent, _element) : document;
-        
-        _.initialize(this);
 
         _(this).set(_events, new Map());
         _(this).set(_fGetElementFromSelector, getElementFromSelectorFactory(this));

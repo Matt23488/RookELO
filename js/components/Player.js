@@ -13,8 +13,6 @@ const _fSetDraggable = Symbol("setDraggable()");
 export default class PlayerComponent extends Component {
     constructor(playerObj) {
         super(importTemplate("playerTemplate"));
-        
-        _.initialize(this);
 
         _(this).set(_id, playerObj.id);
 

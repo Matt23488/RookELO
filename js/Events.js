@@ -6,7 +6,6 @@ const _listeners = Symbol("_listeners");
 
 export default class Events {
     constructor() {
-        _.initialize(this);
 
         _(this).set(_listeners, new Set());
     }

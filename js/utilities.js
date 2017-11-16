@@ -20,14 +20,13 @@ export function getFileFromEvent(ev) {
 
 export function privateAccessorFactory() {
     const privateMembers = new Map();
-    const _ = (self, symbol) => {
+    
+    return function(self, symbol) {
+        if (!privateMembers.has(self)) {
+            privateMembers.set(self, new Map());
+        }
+
         if (symbol) return privateMembers.get(self).get(symbol);
         else        return privateMembers.get(self);
     };
-
-    _.initialize = instance => {
-        privateMembers.set(instance, new Map());
-    };
-
-    return _;
 }

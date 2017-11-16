@@ -9,8 +9,6 @@ export default class ButtonComponent extends Component {
     constructor(selector) {
         super(selector);
 
-        _.initialize(this);
-
         _(this).set(_callbacks, new Set());
 
         super.listen("click", ev => {
