@@ -10,7 +10,8 @@ body {
 
 playerList,
 player,
-team {
+team,
+toast {
     display: block;
     z-index: 100;
 }
@@ -229,4 +230,34 @@ input[type="text"]:focus {
     background-color: deeppink;
     border: 1px solid gray;
     box-shadow: 3px 3px 5px gray;
+}
+
+toast {
+    border-radius: 5px;
+    text-align: left;
+    padding: 10px;
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    font-size: large;
+    animation: fade-out 4s linear 3s;
+}
+
+toast.info {
+    background-color: cyan;
+}
+
+toast.success {
+    background-color: lightgreen;
+}
+
+toast.error {
+    background-color: pink;
+}
+
+@keyframes fade-out {
+    0% { opacity: 1; }
+    75% { opacity: 0; }
+    100% { opacity: 0; }
 }

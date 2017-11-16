@@ -36,6 +36,12 @@ export default class Component {
     get value() { return _(this, _element).value; }
     set value(value) { _(this).set(_element, value); }
 
+    get style() { return _(this, _element).style; }
+    get classList() { return _(this, _element).classList; }
+
+    get height() { return _(this, _element).clientHeight; }
+    get width() { return _(this, _element).clientWidth; }
+
     append(child, selector) {
         _(this, _fGetElementFromSelector)(selector).appendChild(_(child, _element));
     }

@@ -4,6 +4,7 @@ import Team from "./components/Team.js";
 import NewPlayerModal from "./components/modal/NewPlayerModal.js";
 import LoadModal from "./components/modal/LoadModal.js";
 import Button from "./components/Button.js";
+import ToastManager, { ToastType } from "./components/Toast.js";
 import Calculator from "./Calculator.js";
 import GoogleSession from "./OAuth.js";
 import PlayerManager from "./PlayerManager.js";
@@ -24,6 +25,7 @@ let _addPlayerButton;
 let _startButton;
 let _cover;
 let _fileInput;
+let _toast;
 let _calculator;
 let _googleSession;
 let _savedState;
@@ -44,6 +46,7 @@ export default class EloManager {
         _startButton = new Button("#startButton");
         _cover = new Component("#activeGameCover");
         _fileInput = new Component("#fileInput");
+        _toast = ToastManager.getInstance();
         _calculator = Calculator.getInstance(_team1, _team2);
         _googleSession = GoogleSession.getInstance();
         _savedState = false;
@@ -73,6 +76,7 @@ function wireEvents(self) {
         };
 
         _playerManager.addPlayer(newPlayerObj);
+        _toast.displayMessage(`Player "${newPlayerObj.name}" added successfully!`, ToastType.success);
     });
 
     // Load
@@ -89,6 +93,7 @@ function wireEvents(self) {
         _loadModal.hide();
         _loadButton.setVisibility(false);
         _signOutButton.setVisibility(true);
+        _toast.displayMessage(`Logged in successfully!`, ToastType.success);
     });
 
     // Window close
@@ -113,6 +118,7 @@ function wireEvents(self) {
         _playerManager.clear();
         _signOutButton.setVisibility(false);
         _loadButton.setVisibility(true);
+        _toast.displayMessage(`Sign out successful.`);
     });
     _saveButton.onClick(ev => savePlayers());
     _addPlayerButton.onClick(ev => _newPlayerModal.show());
@@ -133,10 +139,12 @@ function wireEvents(self) {
             losingTeam.player1.score = losingTeam.player1.scoreIfLoss;
             losingTeam.player2.score = losingTeam.player2.scoreIfLoss;
 
-            console.log(winningTeam.player1.name, winningPlayer1OldScore, "=>", winningTeam.player1.score);
-            console.log(winningTeam.player2.name, winningPlayer2OldScore, "=>", winningTeam.player2.score);
-            console.log(losingTeam.player1.name, losingPlayer1OldScore, "=>", losingTeam.player1.score);
-            console.log(losingTeam.player2.name, losingPlayer2OldScore, "=>", losingTeam.player2.score);
+            let toastHtml = "";
+            toastHtml += `${winningTeam.player1.name}: ${winningPlayer1OldScore} => ${winningTeam.player1.score}<br />`;
+            toastHtml += `${winningTeam.player2.name}: ${winningPlayer2OldScore} => ${winningTeam.player2.score}<br />`;
+            toastHtml += `${losingTeam.player1.name}: ${losingPlayer1OldScore} => ${losingTeam.player1.score}<br />`;
+            toastHtml += `${losingTeam.player2.name}: ${losingPlayer2OldScore} => ${losingTeam.player2.score}`;
+            _toast.displayMessage(toastHtml);
 
             _playerManager.inactivatePlayers();
         }
@@ -181,18 +189,24 @@ function loadFile(file) {
         const reader = new FileReader();
         reader.addEventListener("load", ev => {
             const contents = ev.target.result;
-            loadPlayers(JSON.parse(contents));
+            try {
+                loadPlayers(JSON.parse(contents));
+            }
+            catch (error) {
+                _toast.displayMessage("Failed to load file!", ToastType.error);
+            }
         });
         reader.readAsText(file);
     }
     else {
-        alert("Failed to load file");
+        _toast.displayMessage("Failed to load file!", ToastType.error);
     }
 }
 
 function loadPlayers(playersObj) {
     _playerManager.clear();
     _playerManager.initialize(playersObj.players);
+    _toast.displayMessage("Loaded ELO state successfully!", ToastType.success);
 }
 
 function savePlayers() {
@@ -210,6 +224,7 @@ function savePlayers() {
     }
     else {
         _googleSession.saveState(obj);
+        _toast.displayMessage("ELO state saved successfully!", ToastType.success);
     }
 }
 
