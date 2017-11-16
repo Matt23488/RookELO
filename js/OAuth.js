@@ -11,29 +11,45 @@ const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/r
 // included, separated by spaces.
 // const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
 const SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata";
-let canSignIn = false;
+
+let self;
+let calledViaGetInstance = false;
+
+let _canSignIn = false;
+let _events;
+let _sessionActive;
+let _fileId;
 
 export default class GoogleSession {
     constructor() {
-        this._events = new Events();
-        this._sessionActive = false;
-        this._fileId = undefined;
+        if (!calledViaGetInstance) throw new Error("You must use the static getInstance() method to get a reference to this class.");
+
+        _events = new Events();
+        _sessionActive = false;
+        _fileId = undefined;
 
         let initInterval = window.setInterval(() => {
             if (!window.googleLoaded) return;
             window.gapi.load('client:auth2', () => {
-                initClient(this);
+                initClient();
             });
             window.clearInterval(initInterval);
-            canSignIn = true;
+            _canSignIn = true;
         }, 10);
     }
 
-    get events() { return this._events;}
-    get sessionActive() { return this._sessionActive; }
+    static getInstance() {
+        calledViaGetInstance = true;
+        if (!self) self = new GoogleSession();
+        calledViaGetInstance = false;
+        return self;
+    }
+
+    get events() { return _events;}
+    get sessionActive() { return _sessionActive; }
 
     signIn() {
-        if (canSignIn) {
+        if (_canSignIn) {
             window.gapi.auth2.getAuthInstance().signIn();
         }
         else {
@@ -43,11 +59,11 @@ export default class GoogleSession {
 
     signOut() {
         window.gapi.auth2.getAuthInstance().signOut();
-        this._sessionActive = false;
+        _sessionActive = false;
     }
 
     saveState(state) {
-        modifyFileWithJSONContent(this._fileId, state);
+        modifyFileWithJSONContent(_fileId, state);
     }
 }
 
@@ -55,7 +71,7 @@ export default class GoogleSession {
  *  Initializes the API client library and sets up sign-in state
  *  listeners.
  */
-function initClient(session) {
+function initClient() {
   window.gapi.client.init({
     apiKey: API_KEY,
     clientId: CLIENT_ID,
@@ -64,7 +80,7 @@ function initClient(session) {
   }).then(function () {
     // Listen for sign-in state changes.
     window.gapi.auth2.getAuthInstance().isSignedIn.listen(isSignedIn => {
-        updateSigninStatus(session, isSignedIn);
+        updateSigninStatus(isSignedIn);
     });
   });
 }
@@ -73,20 +89,20 @@ function initClient(session) {
  *  Called when the signed in status changes, to update the UI
  *  appropriately. After a sign-in, the API is called.
  */
-function updateSigninStatus(session, isSignedIn) {
+function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
     const eventObj = new Events();
     let folderFound = true;
 
     eventObj.listen("finished", file => {
         if (file) {
-            session._fileId = file.id;
+            _fileId = file.id;
             window.gapi.client.drive.files.get({
                 fileId: file.id,
                 alt: "media"
             }).then(response => {
-                session._sessionActive = true;
-                session.events.emit("signedIn", response.result);
+                _sessionActive = true;
+                self.events.emit("signedIn", response.result);
             });
 
 

@@ -45,7 +45,7 @@ export default class EloManager {
         _cover = new Component("#activeGameCover");
         _fileInput = new Component("#fileInput");
         _calculator = Calculator.getInstance(_team1, _team2);
-        _googleSession = new GoogleSession();
+        _googleSession = GoogleSession.getInstance();
         _savedState = false;
 
         wireEvents(this);
