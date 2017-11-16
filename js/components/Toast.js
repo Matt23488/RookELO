@@ -1,7 +1,7 @@
 import Component from "./Component.js";
 import { importTemplate } from "../utilities.js";
 
-let manager;
+let self;
 let calledViaGetInstance = false;
 
 let _body;
@@ -19,9 +19,9 @@ export default class ToastManager {
 
     static getInstance() {
         calledViaGetInstance = true;
-        if (!manager) manager = new ToastManager();
+        if (!self) self = new ToastManager();
         calledViaGetInstance = false;
-        return manager;
+        return self;
     }
 
     displayMessage(text, type = ToastType.info) {

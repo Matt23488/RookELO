@@ -92,9 +92,9 @@ export default class Component {
     }
 }
 
-function getElementFromSelectorFactory(component) {
+function getElementFromSelectorFactory(self) {
     return selector => {
-        const element = _(component, _element);
+        const element = _(self, _element);
         return selector ? element.querySelector(selector) : element;
     };
 }

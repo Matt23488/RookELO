@@ -1,4 +1,4 @@
-let instance;
+let self;
 let calledViaGetInstace = false;
 
 export default class Calculator {
@@ -15,10 +15,10 @@ export default class Calculator {
 
     static getInstance(team1, team2) {
         calledViaGetInstace = true;
-        if (!instance) instance = new Calculator(team1, team2);
+        if (!self) self = new Calculator(team1, team2);
         calledViaGetInstace = false;
 
-        return instance;
+        return self;
     }
 }
 

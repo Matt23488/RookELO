@@ -97,8 +97,8 @@ function wireEventsFactory(self) {
     };
 }
 
-function playerChangedEmitterFactory(teamPlayerComponent) {
+function playerChangedEmitterFactory(self) {
     return () => {
-        teamPlayerComponent.events.emit("playerChanged");
+        self.events.emit("playerChanged");
     };
 }
