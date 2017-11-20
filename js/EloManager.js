@@ -85,7 +85,10 @@ function wireEvents(self) {
     });
     _loadModal.events.listen("upload", () => {
         // Still need to replace this with a Component.
+        // Unfortunately, the commented line doesn't appear to work.
+        // The only thing I can find is that it may be a security feature?
         document.getElementById("fileInput").click();
+        // _fileInput.emit("click");
     });
 
     // Google Session

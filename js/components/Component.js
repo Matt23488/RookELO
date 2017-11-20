@@ -27,13 +27,6 @@ export default class Component {
         _(this).set(_fGetElementFromSelector, getElementFromSelectorFactory(this));
     }
 
-    // TODO: I need to remove this. It's referenced in NewPlayerModal.
-    // I'm just too lazy to do it now after this major refactor.
-    //get element() { return _(this, _element); }
-
-    // get value() { return _(this, _element).value; }
-    // set value(value) { _(this).set(_element, value); }
-
     get style() { return _(this, _element).style; }
     get classList() { return _(this, _element).classList; }
 
