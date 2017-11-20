@@ -172,10 +172,11 @@ function wireEvents(self) {
     });
 
     _fileInput.listen("change", ev => {
-        if (_fileInput.value === "") return;
+        if (_fileInput.getValue() === "") return;
 
         const file = ev.target.files[0];
-        _fileInput.value = "";
+        _fileInput.setValue("");
+        _startButton.setVisibility(false);
         loadFile(file);
     });
 }
