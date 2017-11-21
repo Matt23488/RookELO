@@ -8,7 +8,7 @@ import ToastManager, { ToastType } from "./components/Toast.js";
 import Calculator from "./Calculator.js";
 import GoogleSession from "./OAuth.js";
 import PlayerManager from "./PlayerManager.js";
-import { preventDefault, getFileFromEvent } from "./utilities.js";
+import { preventDefault, getFileFromEvent, max } from "./utilities.js";
 
 let self;
 let calledViaStart = false;
@@ -29,6 +29,7 @@ let _toast;
 let _calculator;
 let _googleSession;
 let _savedState;
+let _records;
 
 export default class EloManager {
     constructor() {
@@ -50,6 +51,10 @@ export default class EloManager {
         _calculator = Calculator.getInstance(_team1, _team2);
         _googleSession = GoogleSession.getInstance();
         _savedState = false;
+        _records = {
+            highScore: { name: "", score: 1000 },
+            lowScore: { name: "", score: 1000 }
+        };
 
         wireEvents(this);
     }
@@ -93,7 +98,7 @@ function wireEvents(self) {
 
     // Google Session
     _googleSession.events.listen("signedIn", state => {
-        loadPlayers(state);
+        loadState(state);
         _loadModal.hide();
         _loadButton.setVisibility(false);
         _signOutButton.setVisibility(true);
@@ -125,7 +130,7 @@ function wireEvents(self) {
         _loadButton.setVisibility(true);
         _toast.displayMessage(`Sign out successful.`);
     });
-    _saveButton.onClick(ev => savePlayers());
+    _saveButton.onClick(ev => saveState());
     _addPlayerButton.onClick(ev => _newPlayerModal.show());
 
     _startButton.onClick(ev => {
@@ -150,6 +155,18 @@ function wireEvents(self) {
             toastHtml += `${losingTeam.player1.name}: ${losingPlayer1OldScore} => ${losingTeam.player1.score}<br />`;
             toastHtml += `${losingTeam.player2.name}: ${losingPlayer2OldScore} => ${losingTeam.player2.score}`;
             _toast.displayMessage(toastHtml);
+
+            // Update records
+            const highScorerForGame = max(winningTeam.player1, winningTeam.player2, p => p.score);
+            const lowScorerForGame = max(losingTeam.player1, losingTeam.player2, p => p.score);
+            if (highScorerForGame.score > _records.highScore.score) {
+                _records.highScore.name = highScorerForGame.name;
+                _records.highScore.score = highScorerForGame.score;
+            }
+            if (lowScorerForGame.score < _records.lowScore.score) {
+                _records.lowScore.name = lowScorerForGame.name;
+                _records.lowScore.score = lowScorerForGame.score;
+            }
 
             _playerManager.inactivatePlayers();
         }
@@ -196,7 +213,7 @@ function loadFile(file) {
         reader.addEventListener("load", ev => {
             const contents = ev.target.result;
             try {
-                loadPlayers(JSON.parse(contents));
+                loadState(JSON.parse(contents));
             }
             catch (error) {
                 _toast.displayMessage("Failed to load file!", ToastType.error);
@@ -209,15 +226,45 @@ function loadFile(file) {
     }
 }
 
-function loadPlayers(playersObj) {
+function loadState(stateObj) {
     _startButton.setVisibility(false);
-    _playerManager.clear();
-    _playerManager.initialize(playersObj.players);
-    _toast.displayMessage("Loaded ELO state successfully!", ToastType.success);
+    loadPlayers(stateObj.players);
+    loadRecords(stateObj.records);
+    _toast.displayMessage("Loaded ELO state successfully!");
 }
 
-function savePlayers() {
-    const obj = { players: [] };
+function loadPlayers(playersArr) {
+    _playerManager.clear();
+    _playerManager.initialize(playersArr);
+    _toast.displayMessage("Loaded players successfully!", ToastType.success);
+}
+
+function loadRecords(recordsObj) {
+    if (recordsObj) {
+        _records.highScore = recordsObj.highScore;
+        _records.lowScore = recordsObj.lowScore;
+    }
+
+    // Make sure the records are updated, since this is a new feature
+    _playerManager.players.forEach(p => {
+        if (p.score > _records.highScore.score) {
+            _records.highScore.name = p.name;
+            _records.highScore.score = p.score;
+        }
+        else if (p.score < _records.lowScore.score) {
+            _records.lowScore.name = p.name;
+            _records.lowScore.score = p.score;
+        }
+    });
+
+    _toast.displayMessage("Loaded records successfully!", ToastType.success);
+}
+
+function saveState() {
+    const obj = {
+        players: [],
+        records: _records
+    };
 
     _playerManager.players.forEach(p => {
         obj.players.push({

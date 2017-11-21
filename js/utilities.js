@@ -30,3 +30,8 @@ export function privateAccessorFactory() {
         else        return privateMembers.get(self);
     };
 }
+
+export function max(a, b, expression) {
+    if (!expression) expression = obj => obj;
+    return expression(a) > expression(b) ? a : b;
+}
