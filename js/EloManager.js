@@ -8,7 +8,7 @@ import ToastManager, { ToastType } from "./components/Toast.js";
 import Calculator from "./Calculator.js";
 import GoogleSession from "./OAuth.js";
 import PlayerManager from "./PlayerManager.js";
-import { preventDefault, getFileFromEvent, max } from "./utilities.js";
+import { preventDefault, getFileFromEvent, max, min } from "./utilities.js";
 
 let self;
 let calledViaStart = false;
@@ -158,7 +158,7 @@ function wireEvents(self) {
 
             // Update records
             const highScorerForGame = max(winningTeam.player1, winningTeam.player2, p => p.score);
-            const lowScorerForGame = max(losingTeam.player1, losingTeam.player2, p => p.score);
+            const lowScorerForGame = min(losingTeam.player1, losingTeam.player2, p => p.score);
             if (highScorerForGame.score > _records.highScore.score) {
                 _records.highScore.name = highScorerForGame.name;
                 _records.highScore.score = highScorerForGame.score;

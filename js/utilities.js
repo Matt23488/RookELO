@@ -35,3 +35,8 @@ export function max(a, b, expression) {
     if (!expression) expression = obj => obj;
     return expression(a) > expression(b) ? a : b;
 }
+
+export function min(a, b, expression) {
+    if (!expression) expression = obj => obj;
+    return expression(a) < expression(b) ? a : b;
+}
