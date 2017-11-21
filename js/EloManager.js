@@ -149,12 +149,12 @@ function wireEvents(self) {
             losingTeam.player1.score = losingTeam.player1.scoreIfLoss;
             losingTeam.player2.score = losingTeam.player2.scoreIfLoss;
 
-            let toastHtml = "";
-            toastHtml += `${winningTeam.player1.name}: ${winningPlayer1OldScore} => ${winningTeam.player1.score}<br />`;
-            toastHtml += `${winningTeam.player2.name}: ${winningPlayer2OldScore} => ${winningTeam.player2.score}<br />`;
-            toastHtml += `${losingTeam.player1.name}: ${losingPlayer1OldScore} => ${losingTeam.player1.score}<br />`;
-            toastHtml += `${losingTeam.player2.name}: ${losingPlayer2OldScore} => ${losingTeam.player2.score}`;
-            _toast.displayMessage(toastHtml);
+            _toast.getBuilder()
+                .appendLine(`${winningTeam.player1.name}: ${winningPlayer1OldScore} => ${winningTeam.player1.score}`)
+                .appendLine(`${winningTeam.player2.name}: ${winningPlayer2OldScore} => ${winningTeam.player2.score}`)
+                .appendLine(`${losingTeam.player1.name}: ${losingPlayer1OldScore} => ${losingTeam.player1.score}`)
+                .appendLine(`${losingTeam.player2.name}: ${losingPlayer2OldScore} => ${losingTeam.player2.score}`)
+                .display();
 
             // Update records
             const highScorerForGame = max(winningTeam.player1, winningTeam.player2, p => p.score);

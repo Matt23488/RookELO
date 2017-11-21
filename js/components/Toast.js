@@ -38,6 +38,10 @@ export default class ToastManager {
             arrangeActiveMessages();
         }, 6010);
     }
+
+    getBuilder() {
+        return new ToastBuilder();
+    }
 }
 
 function arrangeActiveMessages() {
@@ -63,3 +67,22 @@ export const ToastType = {
     success: "success",
     error: "error"
 };
+
+class ToastBuilder {
+    constructor() {
+        this._content = "";
+    }
+
+    append(text) {
+        this._content += text;
+    }
+
+    appendLine(text) {
+        this.append(`${text}<br />`);
+        return this;
+    }
+
+    display(type = ToastType.info) {
+        return self.displayMessage(this._content, type);
+    }
+}
