@@ -149,7 +149,7 @@ function wireEvents(self) {
             losingTeam.player1.score = losingTeam.player1.scoreIfLoss;
             losingTeam.player2.score = losingTeam.player2.scoreIfLoss;
 
-            _toast.getBuilder()
+            _toast.newBuilder()
                 .appendLine(`${winningTeam.player1.name}: ${winningPlayer1OldScore} => ${winningTeam.player1.score}`)
                 .appendLine(`${winningTeam.player2.name}: ${winningPlayer2OldScore} => ${winningTeam.player2.score}`)
                 .appendLine(`${losingTeam.player1.name}: ${losingPlayer1OldScore} => ${losingTeam.player1.score}`)

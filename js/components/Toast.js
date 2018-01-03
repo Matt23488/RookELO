@@ -39,7 +39,7 @@ export default class ToastManager {
         }, 6010);
     }
 
-    getBuilder() {
+    newBuilder() {
         return new ToastBuilder();
     }
 }
