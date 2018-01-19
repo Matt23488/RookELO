@@ -40,3 +40,13 @@ export function min(a, b, expression) {
     if (!expression) expression = obj => obj;
     return expression(a) < expression(b) ? a : b;
 }
+
+export function compareArrays(arrA, arrB) {
+    if (arrA.length !== arrB.length) return false;
+
+    for (let i = 0; i < arrA.length; i++) {
+        if (arrA[i] !== arrB[i]) return false;
+    }
+
+    return true;
+}

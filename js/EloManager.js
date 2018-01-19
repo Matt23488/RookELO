@@ -8,7 +8,7 @@ import ToastManager, { ToastType } from "./components/Toast.js";
 import Calculator from "./Calculator.js";
 import GoogleSession from "./OAuth.js";
 import PlayerManager from "./PlayerManager.js";
-import { preventDefault, getFileFromEvent, max, min } from "./utilities.js";
+import { preventDefault, getFileFromEvent, max, min, compareArrays } from "./utilities.js";
 
 let self;
 let calledViaStart = false;
@@ -25,6 +25,7 @@ let _addPlayerButton;
 let _startButton;
 let _cover;
 let _fileInput;
+let _body;
 let _toast;
 let _calculator;
 let _googleSession;
@@ -47,6 +48,7 @@ export default class EloManager {
         _startButton = new Button("#startButton");
         _cover = new Component("#activeGameCover");
         _fileInput = new Component("#fileInput");
+        _body = new Component("body");
         _toast = ToastManager.getInstance();
         _calculator = Calculator.getInstance(_team1, _team2);
         _googleSession = GoogleSession.getInstance();
@@ -195,6 +197,18 @@ function wireEvents(self) {
         _fileInput.setValue("");
         _startButton.setVisibility(false);
         loadFile(file);
+    });
+
+    // Konami Code. Will be used to modify player scores for score correcting
+    const code = [38,38,40,40,37,39,37,39,66,65,13];
+    const keyLog = [];
+    _body.listen("keydown", ev => {
+        if (keyLog.length === code.length) keyLog.shift();
+        keyLog.push(ev.keyCode);
+
+        if (compareArrays(keyLog, code)) {
+            _toast.displayMessage("Konami Code activated");
+        }
     });
 }
 
