@@ -3,6 +3,7 @@ import PlayerList from "./components/PlayerList.js";
 import Team from "./components/Team.js";
 import NewPlayerModal from "./components/modal/NewPlayerModal.js";
 import LoadModal from "./components/modal/LoadModal.js";
+import EditScoresModal from "./components/modal/EditScoresModal.js";
 import Button from "./components/Button.js";
 import ToastManager, { ToastType } from "./components/Toast.js";
 import Calculator from "./Calculator.js";
@@ -18,6 +19,7 @@ let _team2;
 let _playerManager;
 let _newPlayerModal;
 let _loadModal;
+let _editScoresModal;
 let _loadButton;
 let _signOutButton;
 let _saveButton;
@@ -41,6 +43,7 @@ export default class EloManager {
         _playerManager = PlayerManager.getInstance(_team1, _team2);
         _newPlayerModal = new NewPlayerModal();
         _loadModal = new LoadModal();
+        _editScoresModal = EditScoresModal.getInstance(_playerManager);
         _loadButton = new Button("#loadButton");
         _signOutButton = new Button("#signOutButton");
         _saveButton = new Button("#saveButton");
@@ -208,7 +211,19 @@ function wireEvents(self) {
 
         if (compareArrays(keyLog, code)) {
             _toast.displayMessage("Konami Code activated");
+            _editScoresModal.show();
         }
+    });
+
+    // Save scores
+    _editScoresModal.events.listen("save", () => {
+        const currentPlayers = [..._playerManager.players];
+        _editScoresModal.scores.forEach(score => {
+            currentPlayers.filter(p => p.id === score.id)[0].score = score.score;
+        });
+        _playerManager.sortList();
+
+        _toast.displayMessage("Scores updated successfully!", ToastType.success);
     });
 }
 

@@ -37,6 +37,8 @@ export default class ToastManager {
             _activeMessages.delete(toast);
             arrangeActiveMessages();
         }, 6010);
+
+        text.split("<br />").forEach(t => console.log(t));
     }
 
     newBuilder() {
@@ -75,11 +77,11 @@ class ToastBuilder {
 
     append(text) {
         this._content += text;
+        return this;
     }
 
     appendLine(text) {
-        this.append(`${text}<br />`);
-        return this;
+        return this.append(`${text}<br />`);
     }
 
     display(type = ToastType.info) {

@@ -32,7 +32,7 @@ export default class PlayerListComponent extends Component {
     addPlayer(player) {
         this.append(player);
         _players.add(player);
-        sort();
+        self.sort();
     }
     
     removePlayer(player) {
@@ -43,6 +43,12 @@ export default class PlayerListComponent extends Component {
     clear() {
         _players.clear();
     }
+
+    sort() {
+        [..._players]
+            .sort((a, b) => b.score - a.score)
+            .forEach(p => self.append(p));
+    }
 }
 
 function wireEvents(self) {
@@ -52,10 +58,4 @@ function wireEvents(self) {
         ev.stopPropagation();
         self.events.emit("movePlayer", parseInt(ev.dataTransfer.getData("text")), self);
     });
-}
-
-function sort() {
-    [..._players]
-        .sort((a, b) => b.score - a.score)
-        .forEach(p => self.append(p));
 }

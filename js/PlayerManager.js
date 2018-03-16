@@ -83,6 +83,10 @@ export default class PlayerManager {
 
         return activePlayerCount === 4;
     }
+
+    sortList() {
+        _playerList.sort();
+    }
 }
 
 function getNextId() {
