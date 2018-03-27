@@ -58,7 +58,11 @@ export default class EloManager {
         _savedState = false;
         _records = {
             highScore: { name: "", score: 1000 },
-            lowScore: { name: "", score: 1000 }
+            lowScore: { name: "", score: 1000 },
+            clear: function () {
+                this.highScore.name = this.lowScore.name = "";
+                this.highScore.score = this.lowScore.score = 1000;
+            }
         };
 
         wireEvents(this);
@@ -130,6 +134,7 @@ function wireEvents(self) {
     _signOutButton.onClick(ev => {
         _googleSession.signOut();
         _playerManager.clear();
+        _records.clear();
         _signOutButton.setVisibility(false);
         _startButton.setVisibility(false);
         _loadButton.setVisibility(true);
@@ -219,7 +224,18 @@ function wireEvents(self) {
     _editScoresModal.events.listen("save", () => {
         const currentPlayers = [..._playerManager.players];
         _editScoresModal.scores.forEach(score => {
-            currentPlayers.filter(p => p.id === score.id)[0].score = score.score;
+            const player = currentPlayers.filter(p => p.id === score.id)[0];
+            player.score = score.score;
+
+            // Update records as necessary
+            if (player.score > _records.highScore.score) {
+                _records.highScore.name = player.name;
+                _records.highScore.score = player.score;
+            }
+            else if (player.score < _records.lowScore.score) {
+                _records.lowScore.name = player.name;
+                _records.lowScore.score = player.score;
+            }
         });
         _playerManager.sortList();
 
